@@ -22,4 +22,4 @@ npm run express
 
 ## 最终的效果
 
-![error.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/90e02851cd1c4e00a59cf7aada8859f8~tplv-k3u1fbpfcp-watermark.image)
+![errrecord.gif](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/90e02851cd1c4e00a59cf7aada8859f8~tplv-k3u1fbpfcp-watermark.image?)
