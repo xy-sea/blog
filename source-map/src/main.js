@@ -1,5 +1,3 @@
-/* eslint-disabled */
-
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
@@ -72,13 +70,16 @@ const findCodeBySourceMap = async ({ fileName, line, column }) => {
   var row = result.line,
     len = codeList.length - 1;
   var start = row - 5 >= 0 ? row - 5 : 0, // 将报错代码显示在中间位置
-    end = start + 10 >= len ? len : start + 10; // 最多展示10行
+    end = start + 9 >= len ? len : start + 9; // 最多展示10行
   let newLines = [];
+  let j = 0;
   for (var i = start; i <= end; i++) {
-    newLines.push(`<div class="code-line ${i + 1 == row ? 'heightlight' : ''}" title="${i + 1 == row ? result.source : ''}">${repalceAll(codeList[i])}</div>`);
+    j++;
+    newLines.push(`<div class="code-line ${i + 1 == row ? 'heightlight' : ''}" title="${i + 1 == row ? result.source : ''}">${j}: ${repalceAll(codeList[i])}</div>`);
   }
+
   let target = document.querySelector('#text');
-  target.innerHTML = `<div class="errdetail">${newLines.join('')}</div>`;
+  target.innerHTML = `<div class="errdetail"><div class="errheader">${result.source} at line ${result.column}:${row}</div><div class="errdetail">${newLines.join('')}</div></div>`;
 };
 
 new Vue({

@@ -1,24 +1,25 @@
-# myapp
+# 使用 source-map 进行代码还原
 
-## Project setup
+## 安装
+
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+## 运行 dist 文件夹已打包好的前端项目
+
+cd dist 然后 serve
+
+## 运行后端服务
+
 ```
-npm run serve
+npm run express
 ```
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## 错误还原的示例
 
-### Lints and fixes files
-```
-npm run lint
-```
+![error.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9747f417153144d993b5e5e0ccd5ce9f~tplv-k3u1fbpfcp-watermark.image)
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## 最终的效果
+
+![error.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/90e02851cd1c4e00a59cf7aada8859f8~tplv-k3u1fbpfcp-watermark.image)

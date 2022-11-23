@@ -20,7 +20,6 @@
 
 nav {
   padding: 30px;
-
   a {
     font-weight: bold;
     color: #2c3e50;
@@ -34,7 +33,14 @@ nav {
 .errdetail {
   text-align: left;
 }
+.code-line {
+  padding: 5px 0;
+}
 .heightlight {
   background-color: yellowgreen;
+}
+.errheader {
+  padding: 10px;
+  border-bottom: 1px solid rgb(214, 210, 210);
 }
 </style>

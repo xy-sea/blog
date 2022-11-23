@@ -4,7 +4,6 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const fs = require('fs');
-const sourceMap = require('source-map');
 
 //设置允许跨域访问该服务.
 app.all('*', function (res, req, next) {
@@ -15,10 +14,12 @@ app.all('*', function (res, req, next) {
   next();
 });
 
-// 注意 res req的顺序
+// 获取js.map源码文件
 app.get('/getmap', (req, res) => {
+  // req.query 获取接口参数
   let fileName = req.query.fileName;
   let mapFile = path.join(__filename, '..', 'dist/js');
+  // 拿到dist目录下对应map文件的路径
   let mapPath = path.join(mapFile, `${fileName}.map`);
   console.log('path', mapPath);
   fs.readFile(mapPath, function (err, data) {
@@ -26,64 +27,8 @@ app.get('/getmap', (req, res) => {
       console.error(err);
       return;
     }
-
     res.send(data);
-
-    // var sourcesPathMap = {};
-    // function fixPath(filepath) {
-    //   return filepath.replace(/\.[\.\/]+/g, '');
-    // }
-    // var fileContent = data.toString(),
-    //   fileObj = JSON.parse(fileContent),
-    //   sources = fileObj.sources;
-    // sources.map((item) => {
-    //   sourcesPathMap[fixPath(item)] = item;
-    // });
-    // var consumer = new sourceMap.SourceMapConsumer(fileContent);
-    // var lookup = {
-    //   line: 1,
-    //   column: 3071
-    // };
-    // var result = consumer.originalPositionFor(lookup);
-    // var originSource = sourcesPathMap[result.source],
-    //   sourcesContent = fileObj.sourcesContent[sources.indexOf(originSource)];
-    // result.sourcesContent = sourcesContent;
-    // console.log(result, '还原之后的 code');
-    // req.send(result);
-
-    // callback && callback(result);
-    // const consumer = new sourceMap.SourceMapConsumer(data);
-    // // 通过报错位置查找到对应的源文件名称以及报错行数
-    // const lookUpResult = consumer.originalPositionFor({
-    //   line: 1,
-    //   column: 3071
-    // });
-    // console.log('lookUpResult', lookUpResult);
-    // // 那么就可以通过 sourceContentFor 这个方法找到报错的源代码
-    // const code = consumer.sourceContentFor(lookUpResult.source);
   });
-
-  //   // fileObj = JSON.parse(fileContent),
-  //   // sources = fileObj.sources;
-
-  //   // sources.map((item) => {
-  //   //   sourcesPathMap[fixPath(item)] = item;
-  //   // });
-
-  //   // var consumer = new sourceMap.SourceMapConsumer(fileContent);
-  //   // var lookup = {
-  //   //   line: parseInt(line),
-  //   //   column: parseInt(column)
-  //   // };
-  //   // var result = consumer.originalPositionFor(lookup);
-
-  //   // var originSource = sourcesPathMap[result.source],
-  //   //   sourcesContent = fileObj.sourcesContent[sources.indexOf(originSource)];
-
-  //   // result.sourcesContent = sourcesContent;
-
-  //   // callback && callback(result);
-  // });
 });
 app.listen(8083, () => {
   console.log('Server is running at http://localhost:8083');
