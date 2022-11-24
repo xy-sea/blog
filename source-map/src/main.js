@@ -19,6 +19,19 @@ window.addEventListener('error', (err) => {
   });
 });
 
+window.addEventListener('unhandledrejection', (err) => {
+  console.log('err', err);
+  // code error
+  let stackFrame = ErrorStackParser.parse(err.reason)[0];
+  console.log('unhandledrejection', stackFrame);
+  let { fileName, columnNumber, lineNumber } = stackFrame;
+  findCodeBySourceMap({
+    fileName,
+    line: lineNumber,
+    column: columnNumber
+  });
+});
+
 Vue.config.errorHandler = async (err) => {
   console.log(err);
   const stackFrame = ErrorStackParser.parse(err)[0];

@@ -21,8 +21,17 @@ export default {
     setTimeout(() => {
       JSON.parse(undefined);
     }, 3000);
+    setTimeout(() => {
+      this.getPromise();
+    }, 5000);
   },
   methods: {
+    getPromise() {
+      new Promise((resolve) => {
+        JSON.parse('');
+        resolve();
+      });
+    },
     fn() {
       let a = undefined;
       if (a.length) {
