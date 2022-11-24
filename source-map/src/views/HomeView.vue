@@ -17,6 +17,11 @@ export default {
   created() {
     this.fn();
   },
+  mounted() {
+    setTimeout(() => {
+      JSON.parse(undefined);
+    }, 3000);
+  },
   methods: {
     fn() {
       let a = undefined;

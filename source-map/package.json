@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./server.js",
+    "test": "npm run build && npm run start",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build"
   },

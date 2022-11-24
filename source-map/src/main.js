@@ -8,6 +8,15 @@ Vue.config.productionTip = false;
 
 window.addEventListener('error', (err) => {
   console.log('err', err);
+  // code error
+  let stackFrame = ErrorStackParser.parse(err.error)[0];
+  console.log('stackFrame', stackFrame);
+  let { fileName, columnNumber, lineNumber } = stackFrame;
+  findCodeBySourceMap({
+    fileName,
+    line: lineNumber,
+    column: columnNumber
+  });
 });
 
 Vue.config.errorHandler = async (err) => {
