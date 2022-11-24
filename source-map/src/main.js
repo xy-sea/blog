@@ -38,7 +38,7 @@ window.addEventListener(
       column: columnNumber
     });
   },
-  true
+  true // true必须加（冒泡阶段捕获），不加捕获不到资源加载异常
 );
 
 window.addEventListener('unhandledrejection', (err) => {
