@@ -6,18 +6,40 @@ import sourceMap from 'source-map-js';
 
 Vue.config.productionTip = false;
 
-window.addEventListener('error', (err) => {
-  console.log('err', err);
-  // code error
-  let stackFrame = ErrorStackParser.parse(err.error)[0];
-  console.log('stackFrame', stackFrame);
-  let { fileName, columnNumber, lineNumber } = stackFrame;
-  findCodeBySourceMap({
-    fileName,
-    line: lineNumber,
-    column: columnNumber
-  });
-});
+// 资源加载错误
+function resourceTransform(target) {
+  return {
+    action_type: 'RESOURCE_ERROR',
+    happen_time: new Date().getTime(),
+    source_url: `资源加载失败： ${target.src.slice(0, 100) || target.href.slice(0, 100)} `,
+    element_type: target.localName
+  };
+}
+
+window.addEventListener(
+  'error',
+  (err) => {
+    console.log('err', err);
+
+    // 资源加载错误 提取有用数据
+    if (err.target.localName) {
+      const data = resourceTransform(err.target);
+      // 上报错误
+      console.log('data', data);
+      return;
+    }
+    // code error
+    let stackFrame = ErrorStackParser.parse(err.error)[0];
+    console.log('stackFrame', stackFrame);
+    let { fileName, columnNumber, lineNumber } = stackFrame;
+    findCodeBySourceMap({
+      fileName,
+      line: lineNumber,
+      column: columnNumber
+    });
+  },
+  true
+);
 
 window.addEventListener('unhandledrejection', (err) => {
   console.log('err', err);
