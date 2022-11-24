@@ -4,6 +4,10 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const fs = require('fs');
+const serveStatic = require('serve-static');
+
+const rootPath = path.join(__dirname, 'dist');
+app.use(serveStatic(rootPath));
 
 //设置允许跨域访问该服务.
 app.all('*', function (res, req, next) {

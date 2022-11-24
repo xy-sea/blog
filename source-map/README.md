@@ -6,15 +6,13 @@
 npm install
 ```
 
-## 运行 dist 文件夹已打包好的前端项目
-
-cd dist 然后 serve
-
-## 运行后端服务
+## 运行
 
 ```
-npm run express
+npm run start
 ```
+
+浏览器输入 http://localhost:8083
 
 ## 错误还原的示例
 

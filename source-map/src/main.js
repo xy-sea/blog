@@ -40,7 +40,7 @@ function loadSourceMap(fileName) {
   let file = matchStr(fileName);
   if (!file) return;
   return new Promise((resolve) => {
-    fetch(`http://localhost:8083/getmap?fileName=${file}`).then((response) => {
+    fetch(`${window.location.origin}/getmap?fileName=${file}`).then((response) => {
       resolve(response.json());
     });
   });
@@ -75,7 +75,7 @@ const findCodeBySourceMap = async ({ fileName, line, column }) => {
   let j = 0;
   for (var i = start; i <= end; i++) {
     j++;
-    newLines.push(`<div class="code-line ${i + 1 == row ? 'heightlight' : ''}" title="${i + 1 == row ? result.source : ''}">${j}: ${repalceAll(codeList[i])}</div>`);
+    newLines.push(`<div class="code-line ${i + 1 == row ? 'heightlight' : ''}" title="${i + 1 == row ? result.source : ''}">${j}. ${repalceAll(codeList[i])}</div>`);
   }
 
   let target = document.querySelector('#text');
