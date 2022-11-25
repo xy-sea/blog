@@ -21,7 +21,9 @@
       <el-table-column prop="address" label="地址"> </el-table-column>
     </el-table>
     <div id="main" style="width: 600px; height: 400px"></div>
-    <div id="replaycontent" style="width: 100%; height: 500px; background-color: #cccccc"></div>
+    <el-dialog title="提示" top="10vh" :visible.sync="rrwebdialog" width="90%" :destroy-on-close="true" @opened="opened">
+      <div id="replaycontent"></div>
+    </el-dialog>
   </div>
 </template>
 
@@ -36,6 +38,7 @@ export default {
   name: 'HomeView',
   data() {
     return {
+      rrwebdialog: false,
       input: '',
       events: [],
       options: [
@@ -162,6 +165,9 @@ export default {
       }, 10000);
     },
     play() {
+      this.rrwebdialog = true;
+    },
+    opened() {
       // console.log('events', this.events);
       const data = this.zip(this.events);
       const result = this.unzip(data);
@@ -218,3 +224,12 @@ export default {
   }
 };
 </script>
+<style>
+.rr-player {
+  float: unset;
+  margin: 0 auto;
+}
+.replaycontent {
+  width: 100%;
+}
+</style>
