@@ -2,7 +2,7 @@
   <div class="home">
     <el-button type="primary" @click="start">录屏</el-button>
     <el-button type="success" @click="play">播放</el-button>
-    <img alt="Vue logo" style="height: 100px" src="../assets/logo.png" />
+    <div id="main" style="width: 400px; height: 300px"></div>
     <el-input v-model="input" placeholder="请输入内容"></el-input>
     <el-button type="text" @click="dialogVisible = true">点击打开 Dialog</el-button>
     <el-dialog title="提示" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
@@ -20,8 +20,8 @@
       <el-table-column prop="name" label="姓名" width="180"> </el-table-column>
       <el-table-column prop="address" label="地址"> </el-table-column>
     </el-table>
-    <div id="main" style="width: 600px; height: 400px"></div>
-    <el-dialog title="提示" top="10vh" :visible.sync="rrwebdialog" width="90%" :destroy-on-close="true" @opened="opened">
+
+    <el-dialog title="播放录屏" custom-class="play-disalog" top="10vh" :fullscreen="true" :visible.sync="rrwebdialog" width="90%" :destroy-on-close="true" @opened="opened">
       <div id="replaycontent"></div>
     </el-dialog>
   </div>
@@ -153,9 +153,9 @@ export default {
           }
           _this.events.push(event);
         },
-        recordCanvas: true
-        // 每5s重新制作快照
-        // checkoutEveryNms: 5 * 1000
+        recordCanvas: true,
+        // 每10s重新制作快照
+        checkoutEveryNms: 10 * 1000
       });
       // 10s停止录屏
       _this.timer = setTimeout(() => {
@@ -170,6 +170,9 @@ export default {
     opened() {
       // console.log('events', this.events);
       const data = this.zip(this.events);
+
+      console.log('data', data);
+
       const result = this.unzip(data);
       // console.log('result', result);
 
@@ -231,5 +234,9 @@ export default {
 }
 .replaycontent {
   width: 100%;
+}
+
+.play-disalog .el-dialog__body {
+  height: 720px;
 }
 </style>

@@ -5,7 +5,6 @@ const app = express();
 const path = require('path');
 const fs = require('fs');
 const serveStatic = require('serve-static');
-
 const rootPath = path.join(__dirname, 'dist');
 app.use(serveStatic(rootPath));
 
@@ -28,7 +27,6 @@ app.get('/getmap', (req, res) => {
   console.log('path', mapPath);
   fs.readFile(mapPath, function (err, data) {
     if (err) {
-      console.error(err);
       return;
     }
     res.send(data);
