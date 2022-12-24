@@ -38,6 +38,7 @@ export default {
   name: 'HomeView',
   data() {
     return {
+      stopFn: null,
       rrwebdialog: false,
       input: '',
       events: [],
@@ -141,52 +142,37 @@ export default {
     },
     start() {
       let _this = this;
-      if (_this.timer) return;
+      // 重新录屏
+      if (_this.stopFn) _this.stopFn();
       _this.events = [];
-      // 调用stopFn停止录像
-      let stopFn = record({
-        emit(event, isCheckout) {
-          // 用任意方式存储 event
-          if (isCheckout) {
-            console.log('isCheckout', isCheckout);
-            _this.events = [];
-          }
+      // 调用stopFn停止录屏
+      _this.stopFn = record({
+        emit(event) {
           _this.events.push(event);
         },
-        recordCanvas: true,
+        recordCanvas: true
         // 每10s重新制作快照
-        checkoutEveryNms: 10 * 1000
+        // checkoutEveryNms: 10 * 1000
       });
-      // 10s停止录屏
-      _this.timer = setTimeout(() => {
-        stopFn();
-        clearTimeout(_this.timer);
-        _this.timer = null;
-      }, 10000);
     },
     play() {
+      // 停止录屏
+      if (this.stopFn) {
+        this.stopFn();
+        this.stopFn = null;
+      }
       this.rrwebdialog = true;
     },
     opened() {
-      // console.log('events', this.events);
       const data = this.zip(this.events);
-
-      console.log('data', data);
-
       const result = this.unzip(data);
-      // console.log('result', result);
-
-      new rrwebPlayer(
-        {
-          target: document.getElementById('replaycontent'),
-          data: {
-            events: result
-          }
-        },
-        {
+      new rrwebPlayer({
+        target: document.getElementById('replaycontent'),
+        props: {
+          events: result,
           UNSAFE_replayCanvas: true
         }
-      );
+      });
     },
     myEcharts() {
       // 基于准备好的dom，初始化echarts实例
@@ -194,6 +180,7 @@ export default {
 
       // 指定图表的配置项和数据
       let option = {
+        animation: false,
         title: {
           text: 'ECharts 入门示例'
         },
