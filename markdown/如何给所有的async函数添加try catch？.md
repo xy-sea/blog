@@ -1,15 +1,10 @@
----
-theme: juejin
-highlight: androidstudio
----
-
 ## 前言
 
 阿里三面的时候被问到了这个问题，当时思路虽然正确，可惜表述的不够清晰
 
-后来花了一些时间整理了下思路，那么如何实现给所有的async函数添加try/catch呢？
+后来花了一些时间整理了下思路，那么如何实现给所有的 async 函数添加 try/catch 呢？
 
-## async如果不加 try/catch 会发生什么事？
+## async 如果不加 try/catch 会发生什么事？
 
 ```
 // 示例
@@ -30,11 +25,12 @@ fn()
 
 可是我很懒，不想一个个加，`懒惰使我们进步`😂
 
-下面，通过手写一个babel 插件，来给所有的async函数添加try/catch
+下面，通过手写一个 babel 插件，来给所有的 async 函数添加 try/catch
 
-## babel插件的最终效果
+## babel 插件的最终效果
 
 原始代码：
+
 ```
 async function fn() {
   await new Promise((resolve, reject) => reject('报错'));
@@ -65,46 +61,47 @@ fn();
 
 通过详细的报错信息，帮助我们快速找到目标文件和具体的报错方法，方便去定位问题
 
-## babel插件的实现思路
+## babel 插件的实现思路
 
-1）借助AST抽象语法树，遍历查找代码中的await关键字
+1）借助 AST 抽象语法树，遍历查找代码中的 await 关键字
 
-2）找到await节点后，从父路径中查找声明的async函数，获取该函数的body（函数中包含的代码）
+2）找到 await 节点后，从父路径中查找声明的 async 函数，获取该函数的 body（函数中包含的代码）
 
-3）创建try/catch语句，将原来async的body放入其中
+3）创建 try/catch 语句，将原来 async 的 body 放入其中
 
-4）最后将async的body替换成创建的try/catch语句
+4）最后将 async 的 body 替换成创建的 try/catch 语句
 
-## babel的核心：AST
+## babel 的核心：AST
 
-先聊聊 AST 这个帅小伙🤠，不然后面的开发流程走不下去
+先聊聊 AST 这个帅小伙 🤠，不然后面的开发流程走不下去
 
-AST是代码的树形结构，生成 AST 分为两个阶段：[**词法分析**](https://en.wikipedia.org/wiki/Lexical_analysis)和 [**语法分析**](https://en.wikipedia.org/wiki/Parsing)
+AST 是代码的树形结构，生成 AST 分为两个阶段：[**词法分析**](https://en.wikipedia.org/wiki/Lexical_analysis)和  [**语法分析**](https://en.wikipedia.org/wiki/Parsing)
 
 **词法分析**
 
-词法分析阶段把字符串形式的代码转换为**令牌（tokens）** ，可以把tokens看作是一个扁平的语法片段数组，描述了代码片段在整个代码中的位置和记录当前值的一些信息
+词法分析阶段把字符串形式的代码转换为**令牌（tokens）** ，可以把 tokens 看作是一个扁平的语法片段数组，描述了代码片段在整个代码中的位置和记录当前值的一些信息
 
-比如`let a = 1`，对应的AST是这样的
+比如`let a = 1`，对应的 AST 是这样的
 
 ![ast-a.jpg](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/253c13fe11a1447e9e2b4e7e6dd76a09~tplv-k3u1fbpfcp-watermark.image?)
 
 **语法分析**
 
-语法分析阶段会把token转换成 AST 的形式，这个阶段会使用token中的信息把它们转换成一个 AST 的表述结构，使用type属性记录当前的类型
+语法分析阶段会把 token 转换成 AST 的形式，这个阶段会使用 token 中的信息把它们转换成一个 AST 的表述结构，使用 type 属性记录当前的类型
 
 例如 let 代表着一个变量声明的关键字，所以它的 type 为 `VariableDeclaration`，而 a = 1 会作为 let 的声明描述，它的 type 为 `VariableDeclarator`
 
-AST在线查看工具：[**AST explorer**](https://astexplorer.net/)
+AST 在线查看工具：[**AST explorer**](https://astexplorer.net/)
 
-**再举个🌰，加深对AST的理解**
+**再举个 🌰，加深对 AST 的理解**
+
 ```
 function demo(n) {
   return n * n;
 }
 ```
 
-转化成AST的结构
+转化成 AST 的结构
 
 ```
 {
@@ -114,12 +111,12 @@ function demo(n) {
       "type": "FunctionDeclaration", // function 的类型叫函数声明；
       "id": { // id 为函数声明的 id
         "type": "Identifier", // 标识符 类型
-        "name": "demo" // 标识符 具有名字 
+        "name": "demo" // 标识符 具有名字
       },
       "expression": false,
       "generator": false,
       "async": false, // 代表是否 是 async function
-      "params": [ // 同级 函数的参数 
+      "params": [ // 同级 函数的参数
         {
           "type": "Identifier",// 参数类型也是 Identifier
           "name": "n"
@@ -135,7 +132,7 @@ function demo(n) {
               "start": 30,
               "end": 35,
               "left": { // 分左 右 中 结构
-                "type": "Identifier", 
+                "type": "Identifier",
                 "name": "n"
               },
               "operator": "*", // 属于操作符
@@ -155,49 +152,51 @@ function demo(n) {
 
 ## 常用的 AST 节点类型对照表
 
-| 类型原名称                | 中文名称      | 描述   |
-| -------------------- | --------- | ------------------------------------------ |
-| Program              | 程序主体      | 整段代码的主体                                    |
-| VariableDeclaration  | 变量声明      | 声明一个变量，例如 var let const                    |
-| `FunctionDeclaration`  | 函数声明      | 声明一个函数，例如 function                         |
-| ExpressionStatement  | 表达式语句     | 通常是调用一个函数，例如 console.log()                 |
-| BlockStatement       | 块语句       | 包裹在 {} 块内的代码，例如 if (condition){var a = 1;} |
-| BreakStatement       | 中断语句      | 通常指 break                                  |
-| ContinueStatement    | 持续语句      | 通常指 continue                               |
-| ReturnStatement      | 返回语句      | 通常指 return                                 |
-| SwitchStatement      | Switch 语句 | 通常指 Switch Case 语句中的 Switch                |
-| IfStatement          | If 控制流语句  | 控制流语句，通常指 if(condition){}else{}            |
-| Identifier           | 标识符       | 标识，例如声明变量时 var identi = 5 中的 identi        |
-| CallExpression       | 调用表达式     | 通常指调用一个函数，例如 console.log()                 |
-| BinaryExpression     | 二进制表达式    | 通常指运算，例如 1+2                               |
-| MemberExpression     | 成员表达式     | 通常指调用对象的成员，例如 console 对象的 log 成员    |
-| ArrayExpression      | 数组表达式     | 通常指一个数组，例如 [1, 3, 5]                       |
-| `FunctionExpression`      | 函数表达式     | 例如const func = function () {}      |
-| `ArrowFunctionExpression`  | 箭头函数表达式 | 例如const func = ()=> {}    |
-| `AwaitExpression`  | await表达式 | 例如let val = await f()    |
-| `ObjectMethod`      | 对象中定义的方法     | 例如 let obj = { fn () {} }      |
-| NewExpression        | New 表达式   | 通常指使用 New 关键词                              |
-| AssignmentExpression | 赋值表达式     | 通常指将函数的返回值赋值给变量                     |
-| UpdateExpression     | 更新表达式     | 通常指更新成员值，例如 i++                            |
-| Literal              | 字面量       | 字面量                                        |
-| BooleanLiteral       | 布尔型字面量    | 布尔值，例如 true false                          |
-| NumericLiteral       | 数字型字面量    | 数字，例如 100                                  |
-| StringLiteral        | 字符型字面量    | 字符串，例如 vansenb                             |
-| SwitchCase           | Case 语句   | 通常指 Switch 语句中的 Case
+| 类型原名称                | 中文名称         | 描述                                                  |
+| ------------------------- | ---------------- | ----------------------------------------------------- |
+| Program                   | 程序主体         | 整段代码的主体                                        |
+| VariableDeclaration       | 变量声明         | 声明一个变量，例如 var let const                      |
+| `FunctionDeclaration`     | 函数声明         | 声明一个函数，例如 function                           |
+| ExpressionStatement       | 表达式语句       | 通常是调用一个函数，例如 console.log()                |
+| BlockStatement            | 块语句           | 包裹在 {} 块内的代码，例如 if (condition){var a = 1;} |
+| BreakStatement            | 中断语句         | 通常指 break                                          |
+| ContinueStatement         | 持续语句         | 通常指 continue                                       |
+| ReturnStatement           | 返回语句         | 通常指 return                                         |
+| SwitchStatement           | Switch 语句      | 通常指 Switch Case 语句中的 Switch                    |
+| IfStatement               | If 控制流语句    | 控制流语句，通常指 if(condition){}else{}              |
+| Identifier                | 标识符           | 标识，例如声明变量时 var identi = 5 中的 identi       |
+| CallExpression            | 调用表达式       | 通常指调用一个函数，例如 console.log()                |
+| BinaryExpression          | 二进制表达式     | 通常指运算，例如 1+2                                  |
+| MemberExpression          | 成员表达式       | 通常指调用对象的成员，例如 console 对象的 log 成员    |
+| ArrayExpression           | 数组表达式       | 通常指一个数组，例如 [1, 3, 5]                        |
+| `FunctionExpression`      | 函数表达式       | 例如 const func = function () {}                      |
+| `ArrowFunctionExpression` | 箭头函数表达式   | 例如 const func = ()=> {}                             |
+| `AwaitExpression`         | await 表达式     | 例如 let val = await f()                              |
+| `ObjectMethod`            | 对象中定义的方法 | 例如 let obj = { fn () {} }                           |
+| NewExpression             | New 表达式       | 通常指使用 New 关键词                                 |
+| AssignmentExpression      | 赋值表达式       | 通常指将函数的返回值赋值给变量                        |
+| UpdateExpression          | 更新表达式       | 通常指更新成员值，例如 i++                            |
+| Literal                   | 字面量           | 字面量                                                |
+| BooleanLiteral            | 布尔型字面量     | 布尔值，例如 true false                               |
+| NumericLiteral            | 数字型字面量     | 数字，例如 100                                        |
+| StringLiteral             | 字符型字面量     | 字符串，例如 vansenb                                  |
+| SwitchCase                | Case 语句        | 通常指 Switch 语句中的 Case                           |
 
-## await节点对应的AST结构
+## await 节点对应的 AST 结构
 
 1）原始代码
+
 ```
 async function fn() {
    await f()
 }
 ```
-对应的AST结构
+
+对应的 AST 结构
 
 ![async.jpg](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/334884dd289b4a85ab9584465e459135~tplv-k3u1fbpfcp-watermark.image?)
 
-2）增加try catch后的代码
+2）增加 try catch 后的代码
 
 ```
 async function fn() {
@@ -208,15 +207,16 @@ async function fn() {
     }
 }
 ```
-对应的AST结构
+
+对应的 AST 结构
 
 ![try.jpg](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1f21f25a4b5e45ea8c0d6ad0d92640c9~tplv-k3u1fbpfcp-watermark.image?)
 
-**通过AST结构对比，插件的核心就是将原始函数的body放到try语句中**
+**通过 AST 结构对比，插件的核心就是将原始函数的 body 放到 try 语句中**
 
-## babel插件开发
+## babel 插件开发
 
-我曾在[《「历时8个月」10万字前端知识体系总结（工程化篇）🔥》](https://juejin.cn/post/7146976516692410376#heading-34)中聊过如何开发一个babel插件
+我曾在[《「历时 8 个月」10 万字前端知识体系总结（工程化篇）🔥》](https://juejin.cn/post/7146976516692410376#heading-34)中聊过如何开发一个 babel 插件
 
 这里简单回顾一下
 
@@ -225,28 +225,29 @@ async function fn() {
 ```
 module.exports = function (babel) {
    let t = babel.type
-   return { 
+   return {
      visitor: {
        // 设置需要范围的节点类型
-       CallExression: (path, state) => { 
+       CallExression: (path, state) => {
          do soming ……
        }
      }
    }
  }
 ```
+
 1）通过 `babel` 拿到 `types` 对象，操作 AST 节点，比如创建、校验、转变等
 
 2）`visitor`：定义了一个访问者，可以设置需要访问的节点类型，当访问到目标节点后，做相应的处理来实现插件的功能
 
-### 寻找await节点
+### 寻找 await 节点
 
-回到业务需求，现在需要找到await节点，可以通过`AwaitExpression`表达式获取
+回到业务需求，现在需要找到 await 节点，可以通过`AwaitExpression`表达式获取
 
 ```
 module.exports = function (babel) {
    let t = babel.type
-   return { 
+   return {
      visitor: {
        // 设置AwaitExpression
        AwaitExpression(path) {
@@ -267,11 +268,11 @@ module.exports = function (babel) {
 const asyncPath = path.findParent(p => p.node.async)
 ```
 
-async 节点的AST结构
+async 节点的 AST 结构
 
 ![asyncTrue.jpg](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ece3ff1773e94b839d8131e322dc4c3c~tplv-k3u1fbpfcp-watermark.image?)
 
-**这里要注意，async 函数分为4种情况：函数声明 、箭头函数 、函数表达式 、函数为对象的方法** 
+**这里要注意，async 函数分为 4 种情况：函数声明 、箭头函数 、函数表达式 、函数为对象的方法**
 
 ```
 // 1️⃣：函数声明
@@ -302,7 +303,7 @@ const obj = {
 ```
 module.exports = function (babel) {
    let t = babel.type
-   return { 
+   return {
      visitor: {
        // 设置AwaitExpression
        AwaitExpression(path) {
@@ -316,9 +317,9 @@ module.exports = function (babel) {
  }
 ```
 
-### 利用babel-template生成try/catch节点
+### 利用 babel-template 生成 try/catch 节点
 
-[babel-template](https://babel.docschina.org/docs/en/babel-template/)可以用以字符串形式的代码来构建AST树节点，快速优雅开发插件
+[babel-template](https://babel.docschina.org/docs/en/babel-template/)可以用以字符串形式的代码来构建 AST 树节点，快速优雅开发插件
 
 ```
 // 引入babel-template
@@ -344,19 +345,19 @@ let tempArgumentObj = {
 let tryNode = temp(tempArgumentObj);
 ```
 
-### async函数体替换成try语句
+### async 函数体替换成 try 语句
 
 ```
 module.exports = function (babel) {
    let t = babel.type
-   return { 
+   return {
      visitor: {
        AwaitExpression(path) {
          let node = path.node;
          const asyncPath = path.findParent((p) => p.node.async && (p.isFunctionDeclaration() || p.isArrowFunctionExpression() || p.isFunctionExpression() || p.isObjectMethod()));
-         
+
          let tryNode = temp(tempArgumentObj);
-         
+
          // 获取父节点的函数体body
          let info = asyncPath.node.body;
 
@@ -371,9 +372,9 @@ module.exports = function (babel) {
  }
 ```
 
-到这里，插件的基本结构已经成型，但还有点问题，如果函数已存在try/catch，该怎么处理判断呢？
+到这里，插件的基本结构已经成型，但还有点问题，如果函数已存在 try/catch，该怎么处理判断呢？
 
-### 若函数已存在try/catch，则不处理
+### 若函数已存在 try/catch，则不处理
 
 ```
 // 示例代码，不再添加try/catch
@@ -386,20 +387,20 @@ async function fn() {
 }
 ```
 
-通过`isTryStatement`判断是否已存在try语句
+通过`isTryStatement`判断是否已存在 try 语句
 
 ```
 module.exports = function (babel) {
    let t = babel.type
-   return { 
+   return {
      visitor: {
        AwaitExpression(path) {
-       
+
         // 判断父路径中是否已存在try语句，若存在直接返回
         if (path.findParent((p) => p.isTryStatement())) {
           return false;
         }
-       
+
          let node = path.node;
          const asyncPath = path.findParent((p) => p.node.async && (p.isFunctionDeclaration() || p.isArrowFunctionExpression() || p.isFunctionExpression() || p.isObjectMethod()));
          let tryNode = temp(tempArgumentObj);
@@ -471,7 +472,8 @@ let funcName = asyncName || (node.argument.callee && node.argument.callee.name) 
 
 ### 最终代码
 
-**入口文件index.js**
+**入口文件 index.js**
+
 ```
 // babel-template 用于将字符串形式的代码来构建AST树节点
 const template = require('babel-template');
@@ -579,6 +581,7 @@ module.exports = function (babel) {
 ```
 
 **util.js**
+
 ```
 const merge = require('deepmerge');
 
@@ -636,11 +639,11 @@ module.exports = {
 
 ```
 
-[github仓库](https://github.com/xy-sea/babel-plugin-await-add-trycatch)
+[github 仓库](https://github.com/xy-sea/babel-plugin-await-add-trycatch)
 
-## babel插件的安装使用
+## babel 插件的安装使用
 
-npm网站搜索`babel-plugin-await-add-trycatch`  
+npm 网站搜索`babel-plugin-await-add-trycatch`
 
 ![npm.jpg](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d7bd639f844243af89fb5e877c05b49c~tplv-k3u1fbpfcp-watermark.image?)
 
@@ -660,16 +663,12 @@ npm网站搜索`babel-plugin-await-add-trycatch`
 [Babel 插件手册](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/zh-Hans/plugin-handbook.md)  
 [嘿，不要给 async 函数写那么多 try/catch 了](https://juejin.cn/post/6844903886898069511)
 
-## 10w字笔记推荐
+## 10w 字笔记推荐
 
-[「历时8个月」10万字前端知识体系总结（基础知识篇）🔥](https://juejin.cn/post/7146973901166215176)
+[「历时 8 个月」10 万字前端知识体系总结（基础知识篇）🔥](https://juejin.cn/post/7146973901166215176)
 
-[「历时8个月」10万字前端知识体系总结（算法篇）🔥](https://juejin.cn/post/7146975493278367752)
+[「历时 8 个月」10 万字前端知识体系总结（算法篇）🔥](https://juejin.cn/post/7146975493278367752)
 
-[「历时8个月」10万字前端知识体系总结（工程化篇）🔥](https://juejin.cn/post/7146976516692410376)
+[「历时 8 个月」10 万字前端知识体系总结（工程化篇）🔥](https://juejin.cn/post/7146976516692410376)
 
-[「历时8个月」10万字前端知识体系总结（前端框架+浏览器原理篇）🔥](https://juejin.cn/post/7146996646394462239)
-
-
-
-
+[「历时 8 个月」10 万字前端知识体系总结（前端框架+浏览器原理篇）🔥](https://juejin.cn/post/7146996646394462239)
