@@ -1,0 +1,46 @@
+性能优化，我建议直接拼凑一篇
+
+5、网站性能优化实战——从12.67s到1.06s的故事， https://juejin.cn/post/6844903655330562062
+写的很详细的文章，作为重点参考的文章，还介绍如何查看GPU硬件加速
+
+1、聊一聊前端性能优化  https://juejin.cn/post/6911472693405548557    五万阅读，1700点赞
+里边还有一些其他案例或小插件，觉得写得还不错
+里边有页面卡顿与优化的案例，效果看起来确实不错，好像底层用的是：调度算法在fiber中的实践
+使用的是fastdom, https://github.com/wilsonpage/fastdom
+
+2、前端性能优化 24 条建议（2020）https://juejin.cn/post/6892994632968306702
+列的比较基础，但确实比较全，也有推荐插件的介绍
+
+3、写给中高级前端关于性能优化的9大策略和6大指标 | 网易四年实践  https://juejin.cn/post/6981673766178783262
+里边有详细的webpack配置优化 可以参考
+
+4、前端性能-首次加载优化70%， https://juejin.cn/post/7153527700286603300
+只是罗列了几个7条常规的策略，感觉文章标题比内容好
+
+5、Webpack优化——将你的构建效率提速翻倍， https://juejin.cn/post/6844903924806189070
+
+access_token_bysee   SuperAdmin#1671000054462
+
+SESSION NWY3MzA0ZGYtYjlkMy00Yzk0LTllZmUtZjBiYmJhNDFhZDRh
+
+锦江图片
+https://img-pub01.visitshanghai.com.cn/app/placelist.png   393k
+https://img-pub01.visitshanghai.com.cn/home_bg.png  129k
+https://img-pub01.visitshanghai.com.cn/hot-map-cover.jpg  554k
+https://img-pub01.visitshanghai.com.cn/hot-map-1.jpg  626k
+https://img-pub01.visitshanghai.com.cn/international/picture/3b8f2ae3ece243a9a595dea0390b227b.jpg  世博会131k
+
+锦江获取地区json https://img-pub01.visitshanghai.com.cn/areaList.json
+
+        'https://img-pub01.visitshanghai.com.cn/hot-map-1.jpg',
+        'https://img-pub01.visitshanghai.com.cn/hot-map-2.jpg',
+        'https://img-pub01.visitshanghai.com.cn/hot-map-3.jpg',
+        'https://img-pub01.visitshanghai.com.cn/hot-map-4.jpg',
+        'https://img-pub01.visitshanghai.com.cn/hot-map-cover.jpg',
+        'https://img-pub01.visitshanghai.com.cn/home_bg.png',
+        'https://img-pub01.visitshanghai.com.cn/international/picture/3b8f2ae3ece243a9a595dea0390b227b.jpg'
+
+最终108k，2.25M
+
+
+

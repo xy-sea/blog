@@ -1,0 +1,39 @@
+{
+  "name": "performance-demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build --report",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "axios": "^1.2.2",
+    "core-js": "^3.8.3",
+    "echarts": "^5.4.1",
+    "element-ui": "^2.15.12",
+    "moment": "^2.29.4",
+    "vue": "^2.6.14",
+    "vue-lazyload": "^1.3.4",
+    "vue-router": "^3.5.1",
+    "vuex": "^3.6.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.16",
+    "@babel/eslint-parser": "^7.12.16",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-plugin-router": "~5.0.0",
+    "@vue/cli-plugin-vuex": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "babel-plugin-component": "^1.1.1",
+    "compression-webpack-plugin": "^10.0.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.0.3",
+    "happypack": "^5.0.1",
+    "less": "^4.0.0",
+    "less-loader": "^8.0.0",
+    "moment-locales-webpack-plugin": "^1.2.0",
+    "vue-template-compiler": "^2.6.14"
+  }
+}

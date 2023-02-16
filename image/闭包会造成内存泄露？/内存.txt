@@ -1,0 +1,22 @@
+手把手教你排查Javascript内存泄漏   https://zhuanlan.zhihu.com/p/322356761
+
+console导致的内存泄漏 因为打印后的对象需要支持在控制台上查看，所以传递给console.log方法的对象是不能被垃圾回收的。我们需要避免在生产环境用console打印对象
+
+JavaScript闭包（内存泄漏、溢出以及内存回收），超直白解析  https://www.cnblogs.com/mingo233/p/13582147.html
+
+JavaScript 内存泄漏教程  https://www.ruanyifeng.com/blog/2017/04/memory-leak.html
+
+一文从零彻底搞懂前端的内存监控、异常、泄漏  
+https://mp.weixin.qq.com/s?__biz=MzkwODIwMDY2OQ==&mid=2247488275&idx=1&sn=50c950795f45b6902be4ddcedffda21b&source=41#wechat_redirect
+
+前端内存泄露浅析  https://juejin.cn/post/6844903934235148296#heading-14
+
+一个Vue页面的内存泄露分析 https://juejin.cn/post/6844903624531935246
+
+Google V8引擎浅析-内存管理 https://juejin.cn/post/7128036227986489374#heading-16
+
+JavaScript 内存机制（前端同学进阶必备） https://juejin.cn/post/6844903615300108302#heading-9
+
+V8 内存浅析  https://zhuanlan.zhihu.com/p/33816534
+
+SESSION  ODFlMTM3ODktMGFmNS00NTQ2LThmYjktNTVhYjg4Njc5NzI5

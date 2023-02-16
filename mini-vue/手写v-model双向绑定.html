@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>vue双向绑定的简单实现</title>
+</head>
+<body>
+<div id="app">
+  <div>年龄: <span>{{info.person.name}}</span></div>
+  <p>{{job}}</p>
+  <input v-model="job" placeholder="请输入工作" type="text">
+</div>
+
+<script>
+  window.onload = function () {
+    // new一个vue对象
+    let vm = new Vue({
+      // el为需要挂载的dom节点
+      el: '#app',
+      data: {
+        info: {
+          person: {
+            name: '加载中'
+          }
+        },
+        job: '程序猿'
+      }
+    })
+    setTimeout(() => {
+      vm.info.person.name = '小明'
+    }, 2000)
+  }
+
+  class Vue {
+    constructor(options) {
+      this.$data = options.data
+      this.$el = document.querySelector(options.el)
+      observe(options.data)
+      this.proxy(this.$data, this)
+      this.compile(this.$el, this)
+    }
+    // 模板编译
+    compile (dom, vm) {
+      Array.from(dom.childNodes).forEach(child => {
+        // 元素节点,匹配v-model，如input textArea元素等
+        if (child.nodeType == 1) { 
+          Array.from(child.attributes).forEach(attr => {
+            // 判断元素是否设置 v-model 属性
+            if (attr.name.includes('v-model')) {
+              Dep.target = child
+              child.value = vm.$data[attr.value]
+              Dep.target = null
+              // 重点：给input原定绑定原生的input事件
+              child.addEventListener('input', (e) => {
+                // 当input输入内容发生变化时，动态设置vm.$data[attr.value]的值
+                vm.$data[attr.value] = e.target.value
+              })
+            }
+          })
+        }
+        if (child.nodeType === 3 && /\{\{(.*)\}\}/.test(child.textContent)) {
+          let key = RegExp.$1.trim()
+          let keyList = key.split('.')
+          let value = vm.$data
+          Dep.target = child
+
+          // 循环遍历，找到info.person.name对应的name值
+          keyList.forEach(item => {
+            value = value[item]
+          })
+          Dep.target = null
+          child.textContent = child.textContent.replace(`{{${key}}}`, value)
+        }
+        if (child.childNodes.length > 0) {
+          // 递归模板编译
+          this.compile(child, vm)
+        }
+      })
+    }
+    // this代理 this.$data
+    // vm.info.person.name 相当于 vm.$data.info.person.name
+    proxy ($data, vm) { 
+      Object.keys($data).forEach(key => {
+        Object.defineProperty(vm, key, {
+          set (newValue) {
+            $data[key] = newValue
+          },
+          get () {
+            return $data[key]
+          }
+        })
+      })
+    }
+  }
+  function observe (data) {
+    if (data && typeof data == 'object') {
+      return new Observe(data)
+    }
+  }
+  // 递归进行数据劫持，使data中的每一层都是响应式的
+  function Observe(data) {
+    Object.keys(data).forEach(key => {
+      let value = data[key]
+      let dep = new Dep()
+      // 递归
+      observe(value)
+      Object.defineProperty(data, key, {
+        get () {
+          Dep.target && dep.add(Dep.target)
+          return value
+        },
+        set (newValue) {
+          value = newValue
+          // 如果新设置的值是一个对象，该对象也要变成响应式的
+          observe(newValue)
+          dep.update(newValue)
+        }
+      })
+    })
+  }
+
+  class Dep {
+    constructor() {
+      this.subs = []
+    }
+    add (target) { 
+      this.subs.push(target)
+    }
+    update (newValue) {
+      this.subs.forEach(node => {
+        if (node.tagName == 'INPUT' || node.tagName == 'TEXTATEA') {
+          node.value = newValue
+        } else {
+          node.textContent = newValue
+        }
+      })
+    }
+  }
+
+</script>
+</body>
+</html>

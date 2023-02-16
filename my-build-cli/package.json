@@ -1,0 +1,28 @@
+{
+  "name": "my-2022-cli",
+  "version": "1.1.0",
+  "description": "一个mini版的脚手架",
+  "main": "./bin/www.js",
+  "bin": "./bin/www.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "bin"
+  ],
+  "keywords": [
+    "my-yuan-cli",
+    "自定义脚手架"
+  ],
+  "author": "海阔天空",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "commander": "^8.3.0",
+    "download-git-repo": "^3.0.2",
+    "fs-extra": "^10.0.0",
+    "inquirer": "^8.2.0",
+    "ora": "^5.4.1",
+    "util": "^0.12.4"
+  }
+}
