@@ -12,19 +12,19 @@ ant-design-vue 需要借助[babel-plugin-import](https://github.com/ant-design/b
 以`babel-plugin-component`为例  
 按需引入 elementUI 的 Button 组件：
 
-```
-import { Button } from 'element-ui'
+```js
+import { Button } from 'element-ui';
 
-Vue.component(Button.name, Button)
+Vue.component(Button.name, Button);
 ```
 
 编译后的文件（自动引入 button.css）：
 
-```
-import _Button from "element-ui/lib/button";
-import _Button2 from "element-ui/lib/theme-chalk/button.css";
+```js
+import _Button from 'element-ui/lib/button';
+import _Button2 from 'element-ui/lib/theme-chalk/button.css';
 // base.css是公共的样式，如图标和淡入淡出的动画
-import "element-ui/lib/theme-chalk/base.css";
+import 'element-ui/lib/theme-chalk/base.css';
 
 Vue.component(_Button.name, _Button);
 ```
@@ -84,10 +84,10 @@ elementUI 和 ant-design-vue 均提供了多种自定义主题的方式，但无
 
 需要将`theme.css`合并到`base.css`中，这样才能保证定义的颜色变量能加载到页面中
 
-```
+```js
 'use strict';
 
-const {series, src, dest} = require('gulp');
+const { series, src, dest } = require('gulp');
 const sass = require('gulp-dart-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const cssmin = require('gulp-cssmin');
@@ -96,32 +96,28 @@ const concat = require('gulp-concat');
 function compile() {
   return src('./src/*.scss')
     .pipe(sass.sync().on('error', sass.logError))
-    .pipe(autoprefixer({
-      overrideBrowserslist: ['ie > 9', 'last 2 versions'],
-      cascade: false
-    }))
+    .pipe(
+      autoprefixer({
+        overrideBrowserslist: ['ie > 9', 'last 2 versions'],
+        cascade: false
+      })
+    )
     .pipe(cssmin())
     .pipe(dest('./lib'));
 }
 
 // 将 theme.css 和 lib/base.css合并成 最终的 base.css
 function compile1() {
-  return src(['./src/theme.css', './lib/base.css'])
-    .pipe(concat('base.css'))
-    .pipe(dest('./lib'));
+  return src(['./src/theme.css', './lib/base.css']).pipe(concat('base.css')).pipe(dest('./lib'));
 }
 
 // 将 base.css、 index.css 合并成 最终的 index.css
 function compile2() {
-  return src(['./lib/base.css', './lib/index.css'])
-    .pipe(concat('index.css'))
-    .pipe(dest('./lib'));
+  return src(['./lib/base.css', './lib/index.css']).pipe(concat('index.css')).pipe(dest('./lib'));
 }
 
 function copyfont() {
-  return src('./src/fonts/**')
-    .pipe(cssmin())
-    .pipe(dest('./lib/fonts'));
+  return src('./src/fonts/**').pipe(cssmin()).pipe(dest('./lib/fonts'));
 }
 
 exports.build = series(compile, compile1, compile2, copyfont);
@@ -133,7 +129,7 @@ exports.build = series(compile, compile1, compile2, copyfont);
 
 5、切换主题时，通过给 js 给 body 设置新的颜色变量
 
-```
+```js
 changeTheme = () => {
   let styleVar = {
     '--color-white': '#ffffff',
@@ -147,7 +143,7 @@ changeTheme = () => {
     '--color-neutral': '#15181a',
     '--color-tip': '#2b2b2c',
     '--color-special': '#202020'
-  }
+  };
   for (let i in styleVar) {
     document.body.style.setProperty(i, styleVar[i]);
   }
@@ -180,22 +176,25 @@ changeTheme = () => {
 // 安装 gulp 和 gulp-css-wrap  
 npm install gulp gulp-css-wrap
 
-```
+```js
 const gulp = require('gulp');
 const cssWrap = require('gulp-css-wrap');
 
 gulp.task('css-wrap', function () {
-  return gulp.src(`./src/*.css`) // 选择文件
-      .pipe(cssWrap({
+  return gulp
+    .src(`./src/*.css`) // 选择文件
+    .pipe(
+      cssWrap({
         selector: '.LightTheme' /* 添加.LightTheme命名空间 */
-      }))
-      .pipe(gulp.dest('./src')) /* 存放的目录 */
-})
+      })
+    )
+    .pipe(gulp.dest('./src')); /* 存放的目录 */
+});
 ```
 
 转化前
 
-```
+```js
 .el-button + .el-button {
     margin-left: 10px
 }
@@ -208,7 +207,7 @@ gulp.task('css-wrap', function () {
 
 转化后
 
-```
+```js
 .LightTheme .el-button + .el-button {
     margin-left: 10px
 }
@@ -232,7 +231,7 @@ package.json 中的 `build:theme` 命令用来打包生成组件库的样式
 2、执行`packages/theme-chalk/gulpfile.js` 将 scss 文件编译成 css 并输出到`packages/theme-chalk/lib 目录`  
 3、执行`cp-cli packages/theme-chalk/lib lib/theme-chalk`，将`packages/theme-chalk 拷贝到 lib/theme-chalk目录`
 
-```
+```js
 // 构建样式： 生成在index.scss && 通过 gulp 将 scss 文件编译成css并输出到packages/theme-chalk/lib目录 && 将生成的样式copy到lib/theme-chalk
 "build:theme": "node build/bin/gen-cssfile && gulp build --gulpfile packages/theme-chalk/gulpfile.js && cp-cli packages/theme-chalk/lib lib/theme-chalk",
 ```
@@ -249,7 +248,7 @@ package.json 中的 `build:theme` 命令用来打包生成组件库的样式
 
 #### 2、打包命令增加 浅色主题的 变量 `cross-env THEME=Light`
 
-```
+```js
 "build:theme": "node build/bin/gen-cssfile && cross-env THEME=Light gulp build --gulpfile packages/theme-chalk/gulpfile.js && cp-cli packages/theme-chalk/lib lib/theme-chalk"
 ```
 
@@ -257,10 +256,10 @@ package.json 中的 `build:theme` 命令用来打包生成组件库的样式
 
 修改 `packages/theme-chalk/gulpfile.js`
 
-```
+```js
 'use strict';
 
-const {series, src, dest} = require('gulp');
+const { series, src, dest } = require('gulp');
 const sass = require('gulp-dart-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const cssmin = require('gulp-cssmin');
@@ -286,10 +285,12 @@ function init() {
 function compile1() {
   return src('./src/*.scss')
     .pipe(sass.sync().on('error', sass.logError))
-    .pipe(autoprefixer({
-      overrideBrowserslist: ['ie > 9', 'last 2 versions'],
-      cascade: false
-    }))
+    .pipe(
+      autoprefixer({
+        overrideBrowserslist: ['ie > 9', 'last 2 versions'],
+        cascade: false
+      })
+    )
     .pipe(cssmin())
     .pipe(dest(`./${theme}`));
 }
@@ -307,9 +308,11 @@ function copyIndex() {
 function compile2() {
   // 排除不需要加扩展名base.css 和 icon.css的文件
   return src([`./${theme}/*.css`, `!./${theme}/base.css`, `!./${theme}/icon.css`])
-    .pipe(cssWrap({
-      selector: themeClass /* 添加的命名空间 */
-    }))
+    .pipe(
+      cssWrap({
+        selector: themeClass /* 添加的命名空间 */
+      })
+    )
     .pipe(cssmin())
     .pipe(dest(`./${theme}`));
 }
@@ -332,17 +335,31 @@ exports.build = series(init, compile1, copyIndex, compile2);
 
 空的 scss 文件有
 
-```
+```js
 // 空的scss文件目录
-['breadcrumb-item', 'button-group', 'checkbox-button', 'checkbox-group', 'collapse-item', 'infiniteScroll',
-  'dropdown-item', 'dropdown-menu', 'form-item', 'infinite-scroll', 'menu-item', 'menu-item-group', 'submenu', 'tab-pane' ];
+[
+  'breadcrumb-item',
+  'button-group',
+  'checkbox-button',
+  'checkbox-group',
+  'collapse-item',
+  'infiniteScroll',
+  'dropdown-item',
+  'dropdown-menu',
+  'form-item',
+  'infinite-scroll',
+  'menu-item',
+  'menu-item-group',
+  'submenu',
+  'tab-pane'
+];
 ```
 
 #### 5、一键打包生成多套主题
 
 打包命令增加 红色主题的 配置和变量 `cross-env THEME=Red`
 
-```
+```js
 "build:theme": "node build/bin/gen-cssfile && cross-env THEME=Light gulp build --gulpfile packages/theme-chalk/gulpfile.js && cross-env THEME=Red gulp build --gulpfile packages/theme-chalk/gulpfile.js && cp-cli packages/theme-chalk/lib lib/theme-chalk"
 ```
 
@@ -361,16 +378,16 @@ exports.build = series(init, compile1, copyIndex, compile2);
 
 **打包命令增加合并的流程**
 
-```
+```js
 "build:theme": "node build/bin/gen-cssfile && cross-env THEME=Light gulp build --gulpfile packages/theme-chalk/gulpfile.js && cross-env THEME=Red gulp build --gulpfile packages/theme-chalk/gulpfile.js && gulp build --gulpfile packages/theme-chalk/gulpfile.js && cp-cli packages/theme-chalk/lib lib/theme-chalk",
 ```
 
 修改 `packages/theme-chalk/gulpfile.js`，增加合并的流程
 
-```
+```js
 'use strict';
 
-const {series, src, dest} = require('gulp');
+const { series, src, dest } = require('gulp');
 const sass = require('gulp-dart-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const cssmin = require('gulp-cssmin');
@@ -395,10 +412,12 @@ function init() {
 function compile1() {
   return src('./src/*.scss')
     .pipe(sass.sync().on('error', sass.logError))
-    .pipe(autoprefixer({
-      overrideBrowserslist: ['ie > 9', 'last 2 versions'],
-      cascade: false
-    }))
+    .pipe(
+      autoprefixer({
+        overrideBrowserslist: ['ie > 9', 'last 2 versions'],
+        cascade: false
+      })
+    )
     .pipe(cssmin())
     .pipe(dest(`./${theme}`));
 }
@@ -415,9 +434,11 @@ function copyIndex() {
 function compile2() {
   // 排除不需要加扩展名的文件
   return src([`./${theme}/*.css`, `!./${theme}/base.css`, `!./${theme}/icon.css`])
-    .pipe(cssWrap({
-      selector: themeClass /* 添加的命名空间 */
-    }))
+    .pipe(
+      cssWrap({
+        selector: themeClass /* 添加的命名空间 */
+      })
+    )
     .pipe(cssmin())
     .pipe(dest(`./${theme}`));
 }
@@ -434,25 +455,24 @@ Components = Object.keys(Components);
 // 添加index, 将Light/index.css和Red/index.css 合并成最终的index.css
 Components.push('index');
 
-let concatList = Components.map(item => () => {
+let concatList = Components.map((item) => () => {
   return compile(item);
 });
 
 // 拷贝 ./src/fonts 到 ./lib/fonts
 function copyfont() {
-  return src('./src/fonts/**')
-    .pipe(cssmin())
-    .pipe(dest('./lib/fonts'));
+  return src('./src/fonts/**').pipe(cssmin()).pipe(dest('./lib/fonts'));
 }
 
 // 拷贝 base.css 和 icon.css 到 ./lib中
 function copyBaseAndIcon() {
-  return src(['./Light/base.css', './Light/icon.css'])
-    .pipe(dest('./lib'));
+  return src(['./Light/base.css', './Light/icon.css']).pipe(dest('./lib'));
 }
 
 // 有theme属性 走打包流程，否则 走合并流程
-let gulpTask = theme ? [init, compile1, copyIndex, compile2] : [...concatList, copyfont, copyBaseAndIcon];
+let gulpTask = theme
+  ? [init, compile1, copyIndex, compile2]
+  : [...concatList, copyfont, copyBaseAndIcon];
 exports.build = series(...gulpTask);
 ```
 

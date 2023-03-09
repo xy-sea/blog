@@ -18,7 +18,7 @@
 2、因为不同浏览器的滚动条外观是不一样的。虽然也可以直接修改 CSS3 中的 `::-webkit-scrollbar` 相关属性来达到修改原生滚动条样式，但这个属性部分浏览器上没有能够完美兼容，而且也难做到动画等交互效果的统一。需要做风格统一时，所以 elementUI 就自己实现了虚拟滚动条  
 **补充说明下：如何修改原生滚动条样式**
 
-```
+```js
 /**
 * 滚动条整体部分
 * width 表示垂直方向滑轨的宽度
@@ -77,15 +77,15 @@
 
 el-scrollbar 滚动条组件用于优化页内滚动条的 UI 效果，使用时必须指定高度！
 
-```
+```js
 <el-scrollbar style="height: 100px;">
-  <p v-for="item in 10">{{item}}</p>
+  <p v-for="item in 10">{{ item }}</p>
 </el-scrollbar>
 ```
 
 隐藏原生横向滚动条
 
-```
+```js
 /deep/ .el-scrollbar__wrap {
   overflow-x: hidden;
 }
@@ -101,7 +101,7 @@ el-scrollbar 滚动条组件用于优化页内滚动条的 UI 效果，使用时
 
 1、打开项目的入口文件**packages/scrollbar/src/main.js**
 
-```
+```js
 export default {
   name: 'ElScrollbar',
   components: { Bar },
@@ -204,21 +204,21 @@ export default {
 2、打开项目的入口文件**src/utils/scrollbar-width.js**  
 了解 scrollbarWidth 函数如何获取原生滚动条的宽度
 
-```
+```js
 // 利用闭包来存储原生滚动条的宽度
 let scrollBarWidth;
 
-export default function() {
+export default function () {
   // 如果是服务端直接返回0
   if (Vue.prototype.$isServer) return 0;
   // 如果scrollBarWidth值存在，返回已存储的值
   if (scrollBarWidth !== undefined) return scrollBarWidth;
 
   /**
-  * 1、生成一个div为outer，将该元素插入到body中
-  * 2、生成一个div为inner（宽度为100%），将该元素插入outer中
-  * 3、原生滚动条宽度：outer的offsetWidth - inner的offsetWidth
-  */
+   * 1、生成一个div为outer，将该元素插入到body中
+   * 2、生成一个div为inner（宽度为100%），将该元素插入outer中
+   * 3、原生滚动条宽度：outer的offsetWidth - inner的offsetWidth
+   */
   const outer = document.createElement('div');
   outer.className = 'el-scrollbar__wrap';
   outer.style.visibility = 'hidden';
@@ -238,7 +238,7 @@ export default function() {
   scrollBarWidth = widthNoScroll - widthWithScroll;
 
   return scrollBarWidth;
-};
+}
 ```
 
 小结：  
@@ -250,7 +250,7 @@ export default function() {
 还是**packages/scrollbar/src/main.js**  
 **scrollTop 与 clientHeight 的比例 = moveY 与虚拟滚动条 thumb 的比例 = 滚动条 thumb 的 translateY**
 
-```
+```js
 mounted() {
   if (this.native) return;
   // 初始化时计算一次滑块的高度
@@ -310,7 +310,7 @@ beforeDestroy() {
 2、给滑轨和滑块分别绑定`mousedown`事件，监听鼠标左键按下事件。  
 **这里分两种情况，一种鼠标点击滑轨，另一种是鼠标拖动滑块**
 
-```
+```js
 export default {
   name: 'Bar',
   props: {
@@ -354,7 +354,7 @@ export default {
 
 **renderThumbStyle**方法用来设置水平和垂直方向滚动条的样式
 
-```
+```js
 /**
  * 以垂直滚动条为例
  * renderThumbStyle({ 40%, 50%, {
@@ -370,7 +370,7 @@ export default {
  * */
 export function renderThumbStyle({ move, size, bar }) {
   const style = {};
-  const translate = `translate${bar.axis}(${ move }%)`;
+  const translate = `translate${bar.axis}(${move}%)`;
 
   style[bar.size] = size;
   style.transform = translate;
@@ -378,7 +378,7 @@ export function renderThumbStyle({ move, size, bar }) {
   style.webkitTransform = translate;
 
   return style;
-};
+}
 ```
 
 ### 情况 1：鼠标点击滑轨
@@ -393,7 +393,7 @@ export function renderThumbStyle({ move, size, bar }) {
 ![bar.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/66b201d2ac1446a48575e79161b41542~tplv-k3u1fbpfcp-watermark.image?)
 具体流程见`clickTrackHandler`方法
 
-```
+```js
 // 点击滑轨时的处理逻辑
 clickTrackHandler(e) {
   /**
@@ -423,7 +423,7 @@ clickTrackHandler(e) {
 3、`offset - thumbClickPosition`计算出滑动距离占滑轨的比例（计算方式和情况 1 一样）  
 4、根据：**视图 clientHeight 与 scrollHeight 的比例 = 虚拟滚动条 thumb 与滑轨 bar 的比例，反向得到，滑块滑块的距离的占比 = scrollTop 与 scrollHeight 的比例**，反向计算出视图的 scrollTop
 
-```
+```js
 clickThumbHandler(e) {
   /**
    * 防止右键单击滑动块

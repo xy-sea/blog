@@ -34,7 +34,7 @@
 
 简单粗暴点，直接修改 window.document 的值，让开发者无法获取 document
 
-```
+```js
 // 将document设置为null
 window.document = null;
 
@@ -42,7 +42,7 @@ window.document = null;
 console.log(window.document);
 
 // 删除document
-delete window.document
+delete window.document;
 
 // 删除无效，打印结果还是document
 console.log(window.document);
@@ -52,7 +52,7 @@ console.log(window.document);
 
 使用 [Object.getOwnPropertyDescriptor](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptor) 查看，会发现 window.document 的 `configurable` 属性为 false（不可配置的）
 
-```
+```js
 Object.getOwnPropertyDescriptor(window, 'document');
 // {get: ƒ, set: undefined, enumerable: true, configurable: false}
 ```
@@ -71,7 +71,7 @@ configurable 决定了是否可以修改属性描述对象，也就是说，conf
 
 在 worker 线程中打印 window
 
-```
+```js
 onmessage = function (e) {
   console.log(window);
   postMessage();
@@ -136,13 +136,13 @@ onmessage = function (e) {
 
 举个 🌰： `ctx`作为执行上下文对象，待执行程序`code`可以访问到的变量，必须都来自 ctx 对象
 
-```
+```js
 // ctx 执行上下文对象
 const ctx = {
-  func: variable => {
+  func: (variable) => {
     console.log(variable);
   },
-  foo: "f1"
+  foo: 'f1'
 };
 
 // 待执行程序
@@ -151,16 +151,16 @@ const code = `func(foo)`;
 
 沙箱示例：
 
-```
+```js
 // 定义全局变量foo
-var foo = "foo1";
+var foo = 'foo1';
 
 // 执行上下文对象
 const ctx = {
-  func: variable => {
+  func: (variable) => {
     console.log(variable);
   },
-  foo: "f1"
+  foo: 'f1'
 };
 
 // 非常简陋的沙箱
@@ -201,24 +201,24 @@ veryPoorSandbox(code, ctx);
 
 沙箱示例：
 
-```
-var foo = "foo1";
+```js
+var foo = 'foo1';
 
 // 执行上下文对象
 const ctx = {
-  func: variable => {
+  func: (variable) => {
     console.log(variable);
   }
 };
 
 // 构造一个 with 来包裹需要执行的代码，返回 with 代码块的一个函数实例
 function withedYourCode(code) {
-  code = "with(shadow) {" + code + "}";
-  return new Function("shadow", code);
+  code = 'with(shadow) {' + code + '}';
+  return new Function('shadow', code);
 }
 
 // 可访问全局作用域的白名单列表
-const access_white_list = ["func"];
+const access_white_list = ['func'];
 
 // 待执行程序
 const code = `func(foo)`;
@@ -260,13 +260,13 @@ iframe  标签可以创造一个独立的浏览器原生级别的运行环境�
 
 沙箱示例：
 
-```
+```js
 // 沙箱全局代理对象类
 class SandboxGlobalProxy {
   constructor(sharedState) {
     // 创建一个 iframe 标签，取出其中的原生浏览器全局对象作为沙箱的全局对象
-    const iframe = document.createElement("iframe", { url: "about:blank" });
-    iframe.style.display = "none";
+    const iframe = document.createElement('iframe', { url: 'about:blank' });
+    iframe.style.display = 'none';
     document.body.appendChild(iframe);
 
     // sandboxGlobal作为沙箱运行时的全局对象
@@ -294,8 +294,8 @@ class SandboxGlobalProxy {
 
 // 构造一个 with 来包裹需要执行的代码，返回 with 代码块的一个函数实例
 function withedYourCode(code) {
-  code = "with(sandbox) {" + code + "}";
-  return new Function("sandbox", code);
+  code = 'with(sandbox) {' + code + '}';
+  return new Function('sandbox', code);
 }
 function maybeAvailableSandbox(code, ctx) {
   withedYourCode(code).call(ctx, ctx);
@@ -313,7 +313,7 @@ const code = `
 
 // sharedGlobal作为与外部执行环境共享的全局对象
 // code中获取的history为最外层作用域的history
-const sharedGlobal = ["history"];
+const sharedGlobal = ['history'];
 
 const globalProxy = new SandboxGlobalProxy(sharedGlobal);
 
@@ -334,7 +334,7 @@ Object.prototype.toString(); // 并没有打印 Traped
 
 2）判断要访问的变量，是否在当前环境的 window 对象中，不在的直接报错，实现禁止通过三方库调接口
 
-```
+```js
 // 设置黑名单
 const blacklist = ['document', 'XMLHttpRequest', 'fetch', 'WebSocket'];
 
@@ -350,13 +350,13 @@ if (blacklist.includes(prop)) {
 
 最终代码：
 
-```
+```js
 // 沙箱全局代理对象类
 class SandboxGlobalProxy {
   constructor(blacklist) {
     // 创建一个 iframe 标签，取出其中的原生浏览器全局对象作为沙箱的全局对象
-    const iframe = document.createElement("iframe", { url: "about:blank" });
-    iframe.style.display = "none";
+    const iframe = document.createElement('iframe', { url: 'about:blank' });
+    iframe.style.display = 'none';
     document.body.appendChild(iframe);
 
     // 获取当前HTMLIFrameElement的Window对象
@@ -365,7 +365,6 @@ class SandboxGlobalProxy {
     return new Proxy(sandboxGlobal, {
       // has 可以拦截 with 代码块中任意属性的访问
       has: (target, prop) => {
-
         // 黑名单中的变量禁止访问
         if (blacklist.includes(prop)) {
           throw new Error(`Can't use: ${prop}!`);
@@ -384,8 +383,8 @@ class SandboxGlobalProxy {
 
 // 使用with关键字，来改变作用域
 function withedYourCode(code) {
-  code = "with(sandbox) {" + code + "}";
-  return new Function("sandbox", code);
+  code = 'with(sandbox) {' + code + '}';
+  return new Function('sandbox', code);
 }
 
 // 将指定的上下文对象，添加到待执行代码作用域的顶部
@@ -414,10 +413,10 @@ makeSandbox(code, globalProxy);
 
 经过与评论区小伙伴的交流，可以通过 `new Image()` 调接口，确实是个漏洞
 
-```
+```js
 // 不需要创建DOM 发送图片请求
 let img = new Image();
-img.src= "http://www.test.com/img.gif";
+img.src = 'http://www.test.com/img.gif';
 ```
 
 黑名单中添加'Image'字段，堵上这个漏洞。如果还有其他漏洞，欢迎交流讨论 💕

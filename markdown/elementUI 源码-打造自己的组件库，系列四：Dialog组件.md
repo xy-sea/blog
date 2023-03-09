@@ -10,7 +10,7 @@
 
 打开**packages/dialog/src/component.vue**
 
-```
+```js
 <template>
   <!--transition组件可以给任何元素和组件添加进入/离开过渡-->
   <!--after-enter、after-leave是对应的钩子-->
@@ -69,7 +69,7 @@
 
 还是**packages/dialog/src/component.vue**
 
-```
+```js
 <script>
   // Popup用来对dialog弹框的流程控制，是下一小节分析的重点
   import Popup from 'element-ui/src/utils/popup';
@@ -272,7 +272,7 @@
 1）`dispatch`是用于派发事件到父组件以及更上级别的指定组件进行接收的  
 2）`broadcast`方法主要用于将数据或者方法广播到子组件以及子孙指定组件进行接收
 
-```
+```js
 /**
  * 广播方法定义
  * @param String componentName 组件名称
@@ -283,7 +283,7 @@
 function broadcast(componentName, eventName, params) {
   // 遍历子组件，对子组件的componentName进行匹配
   // 阅读源码，发现很多组件除了定义name属性外，还定义了componentName了，这里就了解componentName的作用
-  this.$children.forEach(child => {
+  this.$children.forEach((child) => {
     var name = child.$options.componentName;
     if (name === componentName) {
       // 子组件中与传入的componentName相等时，则在子组件中执行eventName方法，参数为params
@@ -348,7 +348,7 @@ export default {
 3、关闭遮罩时如果存在多个弹框，需将遮罩的层级降为上一个弹框的层级  
 （下面会分析`PopupManager.closeModal`方法）
 
-```
+```js
 import Vue from 'vue';
 import merge from 'element-ui/src/utils/merge';
 import PopupManager from 'element-ui/src/utils/popup/popup-manager';
@@ -498,7 +498,13 @@ export default {
          * @param String modalClass modal弹层的显示时候的 class
          * @param Boolean modalFade 是否是淡入淡出
          */
-        PopupManager.openModal(this._popupId, PopupManager.nextZIndex(), this.modalAppendToBody ? undefined : dom, props.modalClass, props.modalFade);
+        PopupManager.openModal(
+          this._popupId,
+          PopupManager.nextZIndex(),
+          this.modalAppendToBody ? undefined : dom,
+          props.modalClass,
+          props.modalFade
+        );
         // 如果设置了lock-scroll属性，默认为true
         if (props.lockScroll) {
           // 这边的话 判断body是不是有 el-popup-parent--hidden
@@ -516,8 +522,13 @@ export default {
           let bodyOverflowY = getStyle(document.body, 'overflowY');
           // 总的来说这边条件就是说 body边上 有滚动条了 那么就给body加上 相应的 padding-right
           // 免得 body 设置上 overflow 为 hidden的时候滚动条消失 页面变宽  发生页面的抖动
-          if (scrollBarWidth > 0 && (bodyHasOverflow || bodyOverflowY === 'scroll') && this.withoutHiddenClass) {
-            document.body.style.paddingRight = this.computedBodyPaddingRight + scrollBarWidth + 'px';
+          if (
+            scrollBarWidth > 0 &&
+            (bodyHasOverflow || bodyOverflowY === 'scroll') &&
+            this.withoutHiddenClass
+          ) {
+            document.body.style.paddingRight =
+              this.computedBodyPaddingRight + scrollBarWidth + 'px';
           }
           // 给body添加el-popup-parent--hidden类名，该类名的样式为overflow: hidden; 从而实现将 body 滚动锁定
           addClass(document.body, 'el-popup-parent--hidden');
@@ -598,15 +609,13 @@ export default {
   }
 };
 
-export {
-  PopupManager
-};
+export { PopupManager };
 ```
 
 打开**packages/src/utils/popup/popup-manager.js**  
 重点分析下`PopupManager.openModal`和`PopupManager.closeModal`方法
 
-```
+```js
 import Vue from 'vue';
 import { addClass, removeClass } from 'element-ui/src/utils/dom';
 
@@ -616,7 +625,7 @@ let zIndex;
 
 // getModal方法用来生成弹框的灰色遮罩
 // 遮罩只用生成一次，然后存到PopupManager.modalDom中，所有的弹框都用同一个遮罩
-const getModal = function() {
+const getModal = function () {
   if (Vue.prototype.$isServer) return;
   let modalDom = PopupManager.modalDom;
   if (modalDom) {
@@ -627,13 +636,13 @@ const getModal = function() {
     PopupManager.modalDom = modalDom;
 
     // 给遮罩绑定上touchmove事件
-    modalDom.addEventListener('touchmove', function(event) {
+    modalDom.addEventListener('touchmove', function (event) {
       event.preventDefault();
       event.stopPropagation();
     });
 
     // 给遮罩绑定上click事件
-    modalDom.addEventListener('click', function() {
+    modalDom.addEventListener('click', function () {
       PopupManager.doOnModalClick && PopupManager.doOnModalClick();
     });
   }
@@ -648,19 +657,19 @@ const PopupManager = {
   modalFade: true,
 
   // 获取instance上的实例
-  getInstance: function(id) {
+  getInstance: function (id) {
     return instances[id];
   },
 
   // 往instance上的注册实例
-  register: function(id, instance) {
+  register: function (id, instance) {
     if (id && instance) {
       instances[id] = instance;
     }
   },
 
   // instance上的销毁实例
-  deregister: function(id) {
+  deregister: function (id) {
     if (id) {
       instances[id] = null;
       delete instances[id];
@@ -668,7 +677,7 @@ const PopupManager = {
   },
 
   // 计算zIndex层级
-  nextZIndex: function() {
+  nextZIndex: function () {
     return PopupManager.zIndex++;
   },
 
@@ -676,7 +685,7 @@ const PopupManager = {
   modalStack: [],
 
   // 执行对应弹框组件上的close方法
-  doOnModalClick: function() {
+  doOnModalClick: function () {
     const topItem = PopupManager.modalStack[PopupManager.modalStack.length - 1];
     if (!topItem) return;
 
@@ -687,7 +696,7 @@ const PopupManager = {
   },
 
   // 该方法用来打开弹框的灰色遮罩
-  openModal: function(id, zIndex, dom, modalClass, modalFade) {
+  openModal: function (id, zIndex, dom, modalClass, modalFade) {
     if (Vue.prototype.$isServer) return;
     if (!id || zIndex === undefined) return;
     // 这里要注意this指向，此时的this为PopupManager对象
@@ -723,7 +732,7 @@ const PopupManager = {
     }
     if (modalClass) {
       let classArr = modalClass.trim().split(/\s+/);
-      classArr.forEach(item => addClass(modalDom, item));
+      classArr.forEach((item) => addClass(modalDom, item));
     }
     // 200毫秒后去掉 v-modal-enter
     setTimeout(() => {
@@ -749,11 +758,11 @@ const PopupManager = {
 
   // 用来关闭遮罩（存在同时打开多个弹框的情况）
   /*
-  * 1、根据id 获取对应的遮罩对象
-  * 2、如果这个id就是modalStack最后一个，直接pop，并将遮罩的层级降为此时modalStack最后一个的层级
-  * 3、如果modalStack.length === 0，也就是此时页面没有弹框了，将body上的modalDom移除，并PopupManager.modalDom = undefined
-  * */
-  closeModal: function(id) {
+   * 1、根据id 获取对应的遮罩对象
+   * 2、如果这个id就是modalStack最后一个，直接pop，并将遮罩的层级降为此时modalStack最后一个的层级
+   * 3、如果modalStack.length === 0，也就是此时页面没有弹框了，将body上的modalDom移除，并PopupManager.modalDom = undefined
+   * */
+  closeModal: function (id) {
     // 获取modalStack
     const modalStack = this.modalStack;
     const modalDom = getModal();
@@ -765,7 +774,7 @@ const PopupManager = {
         // 如果有当前的这个有modalClass  那么把这些个class都去掉
         if (topItem.modalClass) {
           let classArr = topItem.modalClass.trim().split(/\s+/);
-          classArr.forEach(item => removeClass(modalDom, item));
+          classArr.forEach((item) => removeClass(modalDom, item));
         }
         // 最后一个删除掉
         modalStack.pop();
@@ -824,7 +833,7 @@ Object.defineProperty(PopupManager, 'zIndex', {
   }
 });
 
-const getTopPopup = function() {
+const getTopPopup = function () {
   if (Vue.prototype.$isServer) return;
   if (PopupManager.modalStack.length > 0) {
     const topPopup = PopupManager.modalStack[PopupManager.modalStack.length - 1];
@@ -837,14 +846,16 @@ const getTopPopup = function() {
 
 if (!Vue.prototype.$isServer) {
   // handle `esc` key when the popup is shown
-  window.addEventListener('keydown', function(event) {
+  window.addEventListener('keydown', function (event) {
     if (event.keyCode === 27) {
       const topPopup = getTopPopup();
 
       if (topPopup && topPopup.closeOnPressEscape) {
         topPopup.handleClose
           ? topPopup.handleClose()
-          : (topPopup.handleAction ? topPopup.handleAction('cancel') : topPopup.close());
+          : topPopup.handleAction
+          ? topPopup.handleAction('cancel')
+          : topPopup.close();
       }
     }
   });

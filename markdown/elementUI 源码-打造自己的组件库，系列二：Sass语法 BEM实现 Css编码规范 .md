@@ -7,7 +7,7 @@
 1、`!default`和`!global`  
 `!default`用来定义局部变量，`!global`可以把局部变量转全局变量
 
-```
+```js
 #main {
   $width: 5em !global;
   width: $width;
@@ -27,7 +27,7 @@
 2、混入：`@mixin`、`@include`  
 `@mixin`用来定义代码块、`@include`引入
 
-```
+```js
 @mixin color-links {
     color: blue;
     background-color: red;
@@ -45,7 +45,7 @@ span {
 3、`@content` 向混合样式中导入内容  
 从获取`@include{}`中传递过来的所有内容导入到指定位置
 
-```
+```js
 @mixin apply-to-ie6-only {
   * html {
     @content;
@@ -65,7 +65,7 @@ span {
 4、`@at-root` 跳出嵌套  
 跳出到和父级相同的层级
 
-```
+```js
 .block {
     color: red;
     @at-root #{&}__element {
@@ -89,7 +89,7 @@ span {
 
 5、`@each in` 遍历列表
 
-```
+```js
 @each $animal in puma, sea-slug, egret, salamander {
   .#{$animal}-icon {
     background-image: url('/images/#{$animal}.png');
@@ -108,7 +108,7 @@ span {
 
 6、`@if @else` 条件判断
 
-```
+```js
 p {
   @if 1 + 1 == 2 { border: 1px solid; }
   @if 5 < 3 { border: 2px dotted; }
@@ -124,7 +124,7 @@ p {
 1\) `map-has-key`  
 `map-has-key($map,$key)` 函数将返回一个布尔值。当 \$map 中有这个 \$key，则函数返回 true，否则返回 false。 通过`map-get($map,$key)`获取\$key 对应的值
 
-```
+```js
 $map: ('xs' : '200px', 'sm': '100px');
 $key: 'xs';
 @if map-has-key($map, $key) {
@@ -135,14 +135,14 @@ $key: 'xs';
 2） `unquote`  
 `unquote($string)`：删除字符串中的引号
 
-```
+```js
 @debug unquote('Hello Sass!') // Hello Sass!
 ```
 
 3） `inspect`  
 `inspect($value)`函数返回 $value 的字符串表示形式
 
-```
+```js
 @debug inspect(null); // "null"
 @debug inspect(('width': 200px)); // "('width': 200px)"
 ```
@@ -150,14 +150,14 @@ $key: 'xs';
 4） `str-index`  
 `inspect($str, $value)`返回字符串的第一个索引位置(索引从 1 开始)，如果字符串不包含该子字符串，则返回 null
 
-```
+```js
 @debug str-index("sans-serif", "ans"); // 2
 ```
 
 5） `str-slice`  
 `str-slice($str, $beginIndex, $endIndex)` 截取字符串的指定字符
 
-```
+```js
 @debug str-index("(.el-message)", 2, -2); // .el-message
 ```
 
@@ -170,7 +170,7 @@ BEM 代表 `块（block）、元素（element）、修饰符（modifier）`，�
 **打开 packages/theme-chalk/src/button.vue**  
 `该文件列举了BEM的基础配置,如样式名前缀、元素、修饰符、状态前缀`
 
-```
+```js
 $namespace: 'el'; // 所有的组件以el开头，如el-input
 $element-separator: '__'; // 元素以__分割，如el-input__inner
 $modifier-separator: '--'; // 修饰符以--分割，如el-input--mini
@@ -185,7 +185,7 @@ $state-prefix: 'is-'; // 状态以is-开头，如is-disabled
 
 作用：给组件添加`el-`前缀，通过`@content`将`include{}`中传递过来的内容导入到指定位置
 
-```
+```js
 @mixin b($block) {
   $B: $namespace+'-'+$block !global;  // 使用el-拼接组件名
   .#{$B} {
@@ -196,7 +196,7 @@ $state-prefix: 'is-'; // 状态以is-开头，如is-disabled
 
 **组件示例**
 
-```
+```js
 @include b(button) {
   display: inline-block;
   line-height: 1;
@@ -218,7 +218,7 @@ $state-prefix: 'is-'; // 状态以is-开头，如is-disabled
 3、如果父级选择器包含这几种字符，输出父级选择器包含子元素的嵌套关系  
 4、反之原样输出
 
-```
+```js
 @mixin e($element) {
   $E: $element !global;
   $selector: &;
@@ -247,7 +247,7 @@ $state-prefix: 'is-'; // 状态以is-开头，如is-disabled
 
 **组件示例一（父级选择器包含这三种字符）**
 
-```
+```js
 @include b(message-box) {
     color: blue;
     @include m(center) {
@@ -271,7 +271,7 @@ $state-prefix: 'is-'; // 状态以is-开头，如is-disabled
 
 **组件示例二（父级选择器不包含这三种字符）**
 
-```
+```js
 @include b(message-box) {
     color: blue;
     @include m(header) {
@@ -291,7 +291,7 @@ $state-prefix: 'is-'; // 状态以is-开头，如is-disabled
 
 作用：通过`--`连接符将父级选择器和传入的修饰符拼接起来
 
-```
+```js
 @mixin m($modifier) {
   $selector: &;
   $currentSelector: "";
@@ -309,7 +309,7 @@ $state-prefix: 'is-'; // 状态以is-开头，如is-disabled
 
 **组件示例**
 
-```
+```js
 @include b(button) {
   display: inline-block;
   @include m(primary) {
@@ -333,7 +333,7 @@ $state-prefix: 'is-'; // 状态以is-开头，如is-disabled
 补充说明下上文中提到的`hitAllSpecialNestRule`函数  
 该函数用来判断父级选择器（$selector: &），是否包含`--` `.is-` `：`这三种字符
 
-```
+```js
 /* BEM 辅助函数*/
 
 // 该函数将选择器转化为字符串，并截取指定位置的字符

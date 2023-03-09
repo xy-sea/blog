@@ -30,8 +30,10 @@ SourceMap 完美解决了代码反解的问题，项目在打包时，除了生�
 
 例如 `app.a2a3ceec.js` 代码如下：
 
-```
-var add=function(x, y){return x+y;};
+```js
+var add = function (x, y) {
+  return x + y;
+};
 //# sourceMappingURL=app.a2a3ceec.js.map
 ```
 
@@ -39,7 +41,7 @@ var add=function(x, y){return x+y;};
 
 对应的 `app.a2a3ceec.js.map` 代码如下：
 
-```
+```js
 {
   version : 3, // SourceMap标准版本,最新的为3
   file: "js/app.a2a3ceec.js", // 转换后的文件名
@@ -65,7 +67,7 @@ var add=function(x, y){return x+y;};
 
 示例代码：
 
-```
+```js
 import sourceMap from 'source-map-js';
 
 /**
@@ -117,7 +119,7 @@ source-map 的还原流程：
 
 示例代码：
 
-```
+```js
 import ErrorStackParser from 'error-stack-parser';
 
 ErrorStackParser.parse(new Error('BOOM'));
@@ -134,11 +136,11 @@ ErrorStackParser.parse(new Error('BOOM'));
 
 堆栈示例：
 
-```
+```js
 function c() {
   try {
     var bar = baz;
-    throw new Error()
+    throw new Error();
   } catch (e) {
     console.log(e.stack);
   }
@@ -160,7 +162,7 @@ a();
 
 最终代码：
 
-```
+```js
 import ErrorStackParser from 'error-stack-parser';
 
 // 取StackFrame数组中的第一个元素
@@ -219,7 +221,7 @@ web-see 监控通过  [rrweb](https://github.com/rrweb-io/rrweb)  提供了前
 
 录制示例：
 
-```
+```js
 import { record } from 'rrweb';
 // events存储录屏信息
 let events = [];
@@ -234,13 +236,13 @@ rrweb.record({
   },
   recordCanvas: true, // 记录 canvas 内容
   checkoutEveryNms: 10 * 1000, // 每10s重新制作快照
-  checkoutEveryNth: 200, // 每 200 个 event 重新制作快照
+  checkoutEveryNth: 200 // 每 200 个 event 重新制作快照
 });
 ```
 
 播放示例：
 
-```
+```js
 <template>
   <div ref='player'>
   </div>
@@ -295,18 +297,18 @@ rrweb 整体流程：
 
 基于 packFn 的单数据压缩，在录制时可以作为  `packFn`  传入
 
-```
+```js
 rrweb.record({
   emit(event) {},
-  packFn: rrweb.pack,
+  packFn: rrweb.pack
 });
 ```
 
 回放时，需要传入 rrweb.unpack 作为  `unpackFn`  传入
 
-```
+```js
 const replayer = new rrweb.Replayer(events, {
-  unpackFn: rrweb.unpack,
+  unpackFn: rrweb.unpack
 });
 ```
 
@@ -318,7 +320,7 @@ web-see 内部使用 **[pako.js](https://www.npmjs.com/package/pako)、[js-base6
 
 压缩代码示例：
 
-```
+```js
 import pako from 'pako';
 import { Base64 } from 'js-base64';
 
@@ -326,7 +328,8 @@ import { Base64 } from 'js-base64';
 export function zip(data) {
   if (!data) return data;
   // 判断数据是否需要转为JSON
-  const dataJson = typeof data !== 'string' && typeof data !== 'number' ? JSON.stringify(data) : data;
+  const dataJson =
+    typeof data !== 'string' && typeof data !== 'number' ? JSON.stringify(data) : data;
   // 使用Base64.encode处理字符编码，兼容中文
   const str = Base64.encode(dataJson);
   let binaryString = pako.gzip(str);
@@ -341,7 +344,7 @@ export function zip(data) {
 
 解压代码示例：
 
-```
+```js
 import { Base64 } from 'js-base64';
 import pako from 'pako';
 
@@ -393,7 +396,7 @@ export function unzip(b64Data) {
 
 录屏的代码示例：
 
-```
+```js
 handleScreen() {
  try {
   // 存储录屏信息
@@ -439,14 +442,14 @@ handleScreen() {
 
 rrweb 配置如下：
 
-```
+```js
 new rrwebPlayer({
-    target: document.getElementById('canvas'),
-    props: {
-      events: result,
-      // 回放时开启回放 canvas 内容
-      UNSAFE_replayCanvas: true
-    }
+  target: document.getElementById('canvas'),
+  props: {
+    events: result,
+    // 回放时开启回放 canvas 内容
+    UNSAFE_replayCanvas: true
+  }
 });
 ```
 

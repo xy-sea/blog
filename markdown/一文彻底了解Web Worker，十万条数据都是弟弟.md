@@ -90,35 +90,35 @@ Summary: 表示各指标时间占用统计报表
 
 1、安装 worker-loader
 
-```
+```js
 npm install worker-loader
 ```
 
 2、编写 worker.js
 
-```
+```js
 onmessage = function (e) {
   // onmessage获取传入的初始值
   let sum = e.data;
   for (let i = 0; i < 200000; i++) {
     for (let i = 0; i < 10000; i++) {
-      sum += Math.random()
+      sum += Math.random();
     }
   }
   // 将计算的结果传递出去
   postMessage(sum);
-}
+};
 ```
 
 3、通过行内 loader 引入 worker.js
 
-```
-import Worker from "worker-loader!./worker"
+```js
+import Worker from 'worker-loader!./worker';
 ```
 
 4、最终代码
 
-```
+```js
 <template>
     <div>
         <button @click="makeWorker">开始线程</button>
@@ -164,13 +164,13 @@ import Worker from "worker-loader!./worker"
 
 如果直接把下面这段代码直接丢到主线程中，计算过程中页面一直处于假死状态，input 框无法输入
 
-```
+```js
 let sum = 0;
 for (let i = 0; i < 200000; i++) {
-    for (let i = 0; i < 10000; i++) {
-      sum += Math.random()
-    }
+  for (let i = 0; i < 10000; i++) {
+    sum += Math.random();
   }
+}
 ```
 
 ## 前戏差不多了，上硬菜
@@ -183,7 +183,7 @@ for (let i = 0; i < 200000; i++) {
 
 **多线程代码**
 
-```
+```js
 <template>
     <div>
         <button @click="makeWorker">开始线程</button>
@@ -262,191 +262,199 @@ for (let i = 0; i < 200000; i++) {
 
 **worker.js**
 
-```
-import { create, all } from 'mathjs'
+```js
+import { create, all } from 'mathjs';
 const config = {
   number: 'BigNumber',
   precision: 20 // 精度
-}
+};
 const math = create(all, config);
 
 //加
-const numberAdd = (arg1,arg2) => {
+const numberAdd = (arg1, arg2) => {
   return math.number(math.add(math.bignumber(arg1), math.bignumber(arg2)));
-}
+};
 //减
-const numberSub = (arg1,arg2) => {
+const numberSub = (arg1, arg2) => {
   return math.number(math.subtract(math.bignumber(arg1), math.bignumber(arg2)));
-}
+};
 //乘
 const numberMultiply = (arg1, arg2) => {
   return math.number(math.multiply(math.bignumber(arg1), math.bignumber(arg2)));
-}
+};
 //除
 const numberDivide = (arg1, arg2) => {
   return math.number(math.divide(math.bignumber(arg1), math.bignumber(arg2)));
-}
+};
 
 // 数组总体标准差公式
 const popVariance = (arr) => {
-  return Math.sqrt(popStandardDeviation(arr))
-}
+  return Math.sqrt(popStandardDeviation(arr));
+};
 
 // 数组总体方差公式
 const popStandardDeviation = (arr) => {
   let s,
     ave,
     sum = 0,
-    sums= 0,
+    sums = 0,
     len = arr.length;
   for (let i = 0; i < len; i++) {
     sum = numberAdd(Number(arr[i]), sum);
   }
   ave = numberDivide(sum, len);
-  for(let i = 0; i < len; i++) {
-    sums = numberAdd(sums, numberMultiply(numberSub(Number(arr[i]), ave), numberSub(Number(arr[i]), ave)))
+  for (let i = 0; i < len; i++) {
+    sums = numberAdd(
+      sums,
+      numberMultiply(numberSub(Number(arr[i]), ave), numberSub(Number(arr[i]), ave))
+    );
   }
-  s = numberDivide(sums,len)
+  s = numberDivide(sums, len);
   return s;
-}
+};
 
 // 数组加权公式
-const weightedAverage = (arr1, arr2) => { // arr1: 计算列，arr2: 选择的权重列
+const weightedAverage = (arr1, arr2) => {
+  // arr1: 计算列，arr2: 选择的权重列
   let s,
     sum = 0, // 分子的值
-    sums= 0, // 分母的值
+    sums = 0, // 分母的值
     len = arr1.length;
   for (let i = 0; i < len; i++) {
     sum = numberAdd(numberMultiply(Number(arr1[i]), Number(arr2[i])), sum);
     sums = numberAdd(Number(arr2[i]), sums);
   }
-  s = numberDivide(sum,sums)
+  s = numberDivide(sum, sums);
   return s;
-}
+};
 
 // 数组样本方差公式
 const variance = (arr) => {
   let s,
     ave,
     sum = 0,
-    sums= 0,
+    sums = 0,
     len = arr.length;
   for (let i = 0; i < len; i++) {
     sum = numberAdd(Number(arr[i]), sum);
   }
   ave = numberDivide(sum, len);
-  for(let i = 0; i < len; i++) {
-    sums = numberAdd(sums, numberMultiply(numberSub(Number(arr[i]), ave), numberSub(Number(arr[i]), ave)))
+  for (let i = 0; i < len; i++) {
+    sums = numberAdd(
+      sums,
+      numberMultiply(numberSub(Number(arr[i]), ave), numberSub(Number(arr[i]), ave))
+    );
   }
-  s = numberDivide(sums,(len-1))
+  s = numberDivide(sums, len - 1);
   return s;
-}
+};
 
 // 数组中位数
 const middleNum = (arr) => {
-  arr.sort((a,b) => a - b)
-  if(arr.length%2 === 0){ //判断数字个数是奇数还是偶数
-    return numberDivide(numberAdd(arr[arr.length/2-1], arr[arr.length/2]),2);//偶数个取中间两个数的平均数
-  }else{
-    return arr[(arr.length+1)/2-1];//奇数个取最中间那个数
+  arr.sort((a, b) => a - b);
+  if (arr.length % 2 === 0) {
+    //判断数字个数是奇数还是偶数
+    return numberDivide(numberAdd(arr[arr.length / 2 - 1], arr[arr.length / 2]), 2); //偶数个取中间两个数的平均数
+  } else {
+    return arr[(arr.length + 1) / 2 - 1]; //奇数个取最中间那个数
   }
-}
+};
 
 // 数组求和
 const sum = (arr) => {
-  let sum = 0, len = arr.length;
+  let sum = 0,
+    len = arr.length;
   for (let i = 0; i < len; i++) {
     sum = numberAdd(Number(arr[i]), sum);
   }
   return sum;
-}
+};
 
 // 数组平均值
 const average = (arr) => {
-  return numberDivide(sum(arr), arr.length)
-}
+  return numberDivide(sum(arr), arr.length);
+};
 
 // 数组最大值
 const max = (arr) => {
-  let max = arr[0]
+  let max = arr[0];
   for (let i = 0; i < arr.length; i++) {
-    if(max < arr[i]) {
-      max = arr[i]
+    if (max < arr[i]) {
+      max = arr[i];
     }
   }
-  return max
-}
+  return max;
+};
 
 // 数组最小值
 const min = (arr) => {
-  let min = arr[0]
+  let min = arr[0];
   for (let i = 0; i < arr.length; i++) {
-    if(min > arr[i]) {
-      min = arr[i]
+    if (min > arr[i]) {
+      min = arr[i];
     }
   }
-  return min
-}
+  return min;
+};
 
 // 数组有效数据长度
 const count = (arr) => {
-  let remove = ['', ' ', null , undefined, '-']; // 排除无效的数据
-  return arr.filter(item => !remove.includes(item)).length
-}
+  let remove = ['', ' ', null, undefined, '-']; // 排除无效的数据
+  return arr.filter((item) => !remove.includes(item)).length;
+};
 
 // 数组样本标准差公式
 const stdDeviation = (arr) => {
-  return Math.sqrt(variance(arr))
-}
+  return Math.sqrt(variance(arr));
+};
 
 // 数字三位加逗号，保留两位小数
 const formatNumber = (num, pointNum = 2) => {
-  if ((!num && num !== 0) || num == '-') return '--'
-  let arr = (typeof num == 'string' ? parseFloat(num) : num).toFixed(pointNum).split('.')
-  let intNum = arr[0].replace(/\d{1,3}(?=(\d{3})+(.\d*)?$)/g,'$&,')
-  return arr[1] === undefined ? intNum : `${intNum}.${arr[1]}`
-}
+  if ((!num && num !== 0) || num == '-') return '--';
+  let arr = (typeof num == 'string' ? parseFloat(num) : num).toFixed(pointNum).split('.');
+  let intNum = arr[0].replace(/\d{1,3}(?=(\d{3})+(.\d*)?$)/g, '$&,');
+  return arr[1] === undefined ? intNum : `${intNum}.${arr[1]}`;
+};
 
 onmessage = function (e) {
-
-  let {arr, type, weightedList} = e.data
+  let { arr, type, weightedList } = e.data;
   let value = '';
   switch (type) {
     case 'sum':
       value = formatNumber(sum(arr));
-      break
+      break;
     case 'average':
       value = formatNumber(average(arr));
-      break
+      break;
     case 'weightedAverage':
       value = formatNumber(weightedAverage(arr, weightedList));
-      break
+      break;
     case 'max':
       value = formatNumber(max(arr));
-      break
+      break;
     case 'middleNum':
       value = formatNumber(middleNum(arr));
-      break
+      break;
     case 'min':
       value = formatNumber(min(arr));
-      break
+      break;
     case 'variance':
       value = formatNumber(variance(arr));
-      break
+      break;
     case 'popVariance':
       value = formatNumber(popVariance(arr));
-      break
+      break;
     case 'stdDeviation':
       value = formatNumber(stdDeviation(arr));
-      break
+      break;
     case 'popStandardDeviation':
       value = formatNumber(popStandardDeviation(arr));
-      break
-    }
+      break;
+  }
 
   // 发送数据事件
-  postMessage({type, value});
-}
+  postMessage({ type, value });
+};
 ```
 
 ## 35s 变成 6s
@@ -463,10 +471,10 @@ onmessage = function (e) {
 
 ## 十万条太 low 了，百万条数据玩一玩
 
-```
+```js
 // 修改上文的模拟数据
-let arr = new Array(1000000).fill(1).map(() => Math.random()* 10000);
-let weightedList = new Array(1000000).fill(1).map(() => Math.random()* 10000);
+let arr = new Array(1000000).fill(1).map(() => Math.random() * 10000);
+let weightedList = new Array(1000000).fill(1).map(() => Math.random() * 10000);
 ```
 
 时间明显上来了，最长要 50 多 s 了，没事玩一玩，开心就好
@@ -479,7 +487,7 @@ web worker 除了单纯进行计算外，还可以结合**离屏 canvas**进行�
 
 **离屏 canvas 案例**
 
-```
+```js
 <template>
     <div>
         <button @click="makeWorker">开始绘图</button>
@@ -506,19 +514,19 @@ web worker 除了单纯进行计算外，还可以结合**离屏 canvas**进行�
 
 **worker.js**
 
-```
+```js
 onmessage = function (e) {
   // 使用OffscreenCanvas（离屏Canvas）
   let canvas = e.data.canvas;
   // 获取绘图上下文
   let ctx = canvas.getContext('2d');
   // 绘制一个圆弧
-  ctx.beginPath() // 开启路径
-  ctx.arc(150, 75, 50, 0, Math.PI*2);
-  ctx.fillStyle="#1989fa";//设置填充颜色
-  ctx.fill();//开始填充
+  ctx.beginPath(); // 开启路径
+  ctx.arc(150, 75, 50, 0, Math.PI * 2);
+  ctx.fillStyle = '#1989fa'; //设置填充颜色
+  ctx.fill(); //开始填充
   ctx.stroke();
-}
+};
 ```
 
 **效果：**

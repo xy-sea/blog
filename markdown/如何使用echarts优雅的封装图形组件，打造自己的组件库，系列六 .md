@@ -20,7 +20,7 @@ echarts**缺点**： 配置项非常多，特别是对于不太熟悉 echarts �
 
 **最终组件效果如下**
 
-```
+```js
 <template>
   <el-chart type="bar" :chartOptions="chartOptions"></el-chart>
 </template>
@@ -78,53 +78,71 @@ echarts**缺点**： 配置项非常多，特别是对于不太熟悉 echarts �
 1）从示例可以看出 option 有大量关于样式的配置，option 非常冗余  
 2）`样式与数据耦合在一起`，让配置的复用、数据的处理变的很麻烦
 
-```
+```js
 // 常规的配置方式
 let option = {
   backgroundColor: '#ffffff',
-  'color': ['#81adff', '#fcca6a', '#ff9e9e', '#54D5F0', '#FFA380', '#79E0B1', '#EAAFDC', '#90BBE0', '#EBCA9D', '#BBB6F5'],
-  'textStyle': {
-    'color': 'rgba(32,32,32,0.65)',
-    'fontSize': 12,
-    'fontFamily': 'Source Han Sans CN,Arial,Microsoft Yahei'
+  color: [
+    '#81adff',
+    '#fcca6a',
+    '#ff9e9e',
+    '#54D5F0',
+    '#FFA380',
+    '#79E0B1',
+    '#EAAFDC',
+    '#90BBE0',
+    '#EBCA9D',
+    '#BBB6F5'
+  ],
+  textStyle: {
+    color: 'rgba(32,32,32,0.65)',
+    fontSize: 12,
+    fontFamily: 'Source Han Sans CN,Arial,Microsoft Yahei'
   },
   tooltip: {
-    'trigger': 'axis',
-    'backgroundColor': 'rgba(255,255,255,0.95)',
-    'textStyle': {'fontSize': 12, 'color': 'rgba(32,32,32,0.65)'},
-    'axisPointer': {'lineStyle': {'color': 'rgba(32,32,32,0.07)', 'type': 'dotted'}, 'type': 'shadow', 'z': 10}
+    trigger: 'axis',
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    textStyle: { fontSize: 12, color: 'rgba(32,32,32,0.65)' },
+    axisPointer: {
+      lineStyle: { color: 'rgba(32,32,32,0.07)', type: 'dotted' },
+      type: 'shadow',
+      z: 10
+    }
   },
   legend: {
-    'data': ['项目名称1', '项目名称2', '项目名称3'],
-    'type': 'scroll',
-    'pageIconColor': '#202020',
-    'pageIconSize': 12,
-    'pageTextStyle': {'color': 'rgba(32,32,32,0.65)', 'height': 10},
-    'bottom': 10,
-    'itemWidth': 10,
-    'itemHeight': 10,
-    'textStyle': {
-      'color': 'rgba(32,32,32,0.65)',
-      'fontSize': 12
+    data: ['项目名称1', '项目名称2', '项目名称3'],
+    type: 'scroll',
+    pageIconColor: '#202020',
+    pageIconSize: 12,
+    pageTextStyle: { color: 'rgba(32,32,32,0.65)', height: 10 },
+    bottom: 10,
+    itemWidth: 10,
+    itemHeight: 10,
+    textStyle: {
+      color: 'rgba(32,32,32,0.65)',
+      fontSize: 12
     }
   },
   yAxis: {
-    'name': '指标单位',
-    'nameTextStyle': {
-      'color': 'rgba(32,32,32,0.45)',
-      'padding': [0, 10, 0, 0],
-      'lineHeight': 30
-     }
+    name: '指标单位',
+    nameTextStyle: {
+      color: 'rgba(32,32,32,0.45)',
+      padding: [0, 10, 0, 0],
+      lineHeight: 30
+    }
   },
-  series: [{
-    'type': 'bar',
-    'data': [40, 25, 35, 20, 28],
-    'name': '项目名称1'
-  }, {
-    'type': 'bar',
-    'data': [9, 3, 15, 20, 7],
-    'name': '项目名称2'
-  }]
+  series: [
+    {
+      type: 'bar',
+      data: [40, 25, 35, 20, 28],
+      name: '项目名称1'
+    },
+    {
+      type: 'bar',
+      data: [9, 3, 15, 20, 7],
+      name: '项目名称2'
+    }
+  ]
 };
 
 Echarts.init(dom);
@@ -151,7 +169,7 @@ Echarts.setOption(option);
 
 示例如下：
 
-```
+```js
 // 定义一套主题
 let myTheme = {
   'backgroundColor': '#ffffff',
@@ -239,7 +257,7 @@ Echarts.setOption(option);
 
 **注：** 换肤时，需要通过`dispose`方法先销毁之前的实例，再`init`
 
-```
+```js
 // 定义白色主题
 Echarts.registerTheme('White', WhiteJSON);
 // 定义黑色主题
@@ -262,7 +280,7 @@ echartsInstance.dispose();
 
 **以下为柱状图配置项的处理流程：**
 
-```
+```js
 // 引入deep-merge插件
 import DeepMerge from 'deep-merge';
 // 定义深度合并方法
@@ -271,16 +289,16 @@ function merge(a, b) {
 }
 // barOptions是图形组件内置的柱状图配置项
 let barOptions = {
-  'legend': {'bottom': 10},
-  'color': ['#81adff', '#fcca6a', '#ff9e9e', '#54D5F0', '#FFA380'],
-  'grid': { 'top': 50, 'left': 32, 'right': 20, 'bottom': 48, 'containLabel': true},
-  'xAxis': { 'axisLine': {'show': false}, 'axisTick': {'show': false}, 'splitLine': {'show': false}},
-  'yAxis': {
-    'axisTick': {'show': false},
-    'splitLine': {'show': true, 'type': 'value'},
-    'nameTextStyle': {'padding': [0, 25, 0, 0]}
+  legend: { bottom: 10 },
+  color: ['#81adff', '#fcca6a', '#ff9e9e', '#54D5F0', '#FFA380'],
+  grid: { top: 50, left: 32, right: 20, bottom: 48, containLabel: true },
+  xAxis: { axisLine: { show: false }, axisTick: { show: false }, splitLine: { show: false } },
+  yAxis: {
+    axisTick: { show: false },
+    splitLine: { show: true, type: 'value' },
+    nameTextStyle: { padding: [0, 25, 0, 0] }
   },
-  'tooltip': {'trigger': 'axis', 'axisPointer': {'type': 'shadow'}}
+  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } }
 };
 
 // 将外部传入的chartOptions与barOptions进行深度合并，得到最终的options
@@ -288,7 +306,7 @@ let chartOptions = {
   xAxis: {
     data: ['2018年', '2019年', '2020年', '2021年', '2022年']
   },
-  yAxis: { name: '指标单位'},
+  yAxis: { name: '指标单位' },
   series: [
     {
       name: '项目名称1',
@@ -319,9 +337,13 @@ Echarts.setOption(option);
 在 ECharts 中主要通过  [on](https://echarts.apache.org/zh/api.html#echartsInstance.on)  方法添加事件处理函数  
 比如常见的点击事件、legendselectchanged 事件
 
-```
-myChart.on('click', function (params) { console.log(params); });
-myChart.on('legendselectchanged', function (params) { console.log(params); });
+```js
+myChart.on('click', function (params) {
+  console.log(params);
+});
+myChart.on('legendselectchanged', function (params) {
+  console.log(params);
+});
 ```
 
 **如何对外暴露全部的实例事件呢？**
@@ -359,7 +381,7 @@ myChart.on('legendselectchanged', function (params) { console.log(params); });
 
 以柱状图为例：
 
-```
+```js
 <template>
   <el-chart type='bar' :copy-config="{ getUrlMethod: getUrlMethod, copyWidth: 800, copyHeight: 360, isClear: true }"></el-chart>
 </template>
@@ -375,7 +397,7 @@ myChart.on('legendselectchanged', function (params) { console.log(params); });
 </script>
 ```
 
-```
+```js
 <template>
   <div class='el-chart__container'>
     <div class='el-chart' ref='chart' :style='{ width, height }' />

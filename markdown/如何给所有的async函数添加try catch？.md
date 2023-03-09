@@ -6,7 +6,7 @@
 
 ## async 如果不加 try/catch 会发生什么事？
 
-```
+```js
 // 示例
 async function fn() {
   let value = await new Promise((resolve, reject) => {
@@ -14,7 +14,7 @@ async function fn() {
   });
   console.log('do something...');
 }
-fn()
+fn();
 ```
 
 导致浏览器报错：一个未捕获的错误
@@ -31,7 +31,7 @@ fn()
 
 原始代码：
 
-```
+```js
 async function fn() {
   await new Promise((resolve, reject) => reject('报错'));
   await new Promise((resolve) => resolve(1));
@@ -42,14 +42,14 @@ fn();
 
 使用插件转化后的代码：
 
-```
+```js
 async function fn() {
   try {
     await new Promise((resolve, reject) => reject('报错'));
-    await new Promise(resolve => resolve(1));
+    await new Promise((resolve) => resolve(1));
     console.log('do something...');
   } catch (e) {
-    console.log("\nfilePath: E:\\myapp\\src\\main.js\nfuncName: fn\nError:", e);
+    console.log('\nfilePath: E:\\myapp\\src\\main.js\nfuncName: fn\nError:', e);
   }
 }
 fn();
@@ -95,7 +95,7 @@ AST 在线查看工具：[**AST explorer**](https://astexplorer.net/)
 
 **再举个 🌰，加深对 AST 的理解**
 
-```
+```js
 function demo(n) {
   return n * n;
 }
@@ -103,7 +103,7 @@ function demo(n) {
 
 转化成 AST 的结构
 
-```
+```js
 {
   "type": "Program", // 整段代码的主体
   "body": [
@@ -186,9 +186,9 @@ function demo(n) {
 
 1）原始代码
 
-```
+```js
 async function fn() {
-   await f()
+  await f();
 }
 ```
 
@@ -198,13 +198,13 @@ async function fn() {
 
 2）增加 try catch 后的代码
 
-```
+```js
 async function fn() {
-    try {
-        await f()
-    } catch (e) {
-        console.log(e)
-    }
+  try {
+    await f();
+  } catch (e) {
+    console.log(e);
+  }
 }
 ```
 
@@ -222,7 +222,7 @@ async function fn() {
 
 ### 插件的基本格式示例
 
-```
+```js
 module.exports = function (babel) {
    let t = babel.type
    return {
@@ -244,28 +244,28 @@ module.exports = function (babel) {
 
 回到业务需求，现在需要找到 await 节点，可以通过`AwaitExpression`表达式获取
 
-```
+```js
 module.exports = function (babel) {
-   let t = babel.type
-   return {
-     visitor: {
-       // 设置AwaitExpression
-       AwaitExpression(path) {
-         // 获取当前的await节点
-         let node = path.node;
-       }
-     }
-   }
- }
+  let t = babel.type;
+  return {
+    visitor: {
+      // 设置AwaitExpression
+      AwaitExpression(path) {
+        // 获取当前的await节点
+        let node = path.node;
+      }
+    }
+  };
+};
 ```
 
 ### 向上查找 async 函数
 
 通过`findParent`方法，在父节点中搜寻 async 节点
 
-```
+```js
 // async节点的属性为true
-const asyncPath = path.findParent(p => p.node.async)
+const asyncPath = path.findParent((p) => p.node.async);
 ```
 
 async 节点的 AST 结构
@@ -274,54 +274,61 @@ async 节点的 AST 结构
 
 **这里要注意，async 函数分为 4 种情况：函数声明 、箭头函数 、函数表达式 、函数为对象的方法**
 
-```
+```js
 // 1️⃣：函数声明
 async function fn() {
-  await f()
+  await f();
 }
 
 // 2️⃣：函数表达式
 const fn = async function () {
-  await f()
+  await f();
 };
 
 // 3️⃣：箭头函数
 const fn = async () => {
-  await f()
+  await f();
 };
 
 // 4️⃣：async函数定义在对象中
 const obj = {
   async fn() {
-      await f()
+    await f();
   }
-}
+};
 ```
 
 需要对这几种情况进行分别判断
 
-```
+```js
 module.exports = function (babel) {
-   let t = babel.type
-   return {
-     visitor: {
-       // 设置AwaitExpression
-       AwaitExpression(path) {
-         // 获取当前的await节点
-         let node = path.node;
-         // 查找async函数的节点
-         const asyncPath = path.findParent((p) => p.node.async && (p.isFunctionDeclaration() || p.isArrowFunctionExpression() || p.isFunctionExpression() || p.isObjectMethod()));
-       }
-     }
-   }
- }
+  let t = babel.type;
+  return {
+    visitor: {
+      // 设置AwaitExpression
+      AwaitExpression(path) {
+        // 获取当前的await节点
+        let node = path.node;
+        // 查找async函数的节点
+        const asyncPath = path.findParent(
+          (p) =>
+            p.node.async &&
+            (p.isFunctionDeclaration() ||
+              p.isArrowFunctionExpression() ||
+              p.isFunctionExpression() ||
+              p.isObjectMethod())
+        );
+      }
+    }
+  };
+};
 ```
 
 ### 利用 babel-template 生成 try/catch 节点
 
 [babel-template](https://babel.docschina.org/docs/en/babel-template/)可以用以字符串形式的代码来构建 AST 树节点，快速优雅开发插件
 
-```
+```js
 // 引入babel-template
 const template = require('babel-template');
 
@@ -337,8 +344,8 @@ const temp = template(tryTemplate);
 
 // 给模版增加key，添加console.log打印信息
 let tempArgumentObj = {
-   // 通过types.stringLiteral创建字符串字面量
-   CatchError: types.stringLiteral('Error')
+  // 通过types.stringLiteral创建字符串字面量
+  CatchError: types.stringLiteral('Error')
 };
 
 // 通过temp创建try语句的AST节点
@@ -347,70 +354,83 @@ let tryNode = temp(tempArgumentObj);
 
 ### async 函数体替换成 try 语句
 
-```
+```js
 module.exports = function (babel) {
-   let t = babel.type
-   return {
-     visitor: {
-       AwaitExpression(path) {
-         let node = path.node;
-         const asyncPath = path.findParent((p) => p.node.async && (p.isFunctionDeclaration() || p.isArrowFunctionExpression() || p.isFunctionExpression() || p.isObjectMethod()));
+  let t = babel.type;
+  return {
+    visitor: {
+      AwaitExpression(path) {
+        let node = path.node;
+        const asyncPath = path.findParent(
+          (p) =>
+            p.node.async &&
+            (p.isFunctionDeclaration() ||
+              p.isArrowFunctionExpression() ||
+              p.isFunctionExpression() ||
+              p.isObjectMethod())
+        );
 
-         let tryNode = temp(tempArgumentObj);
+        let tryNode = temp(tempArgumentObj);
 
-         // 获取父节点的函数体body
-         let info = asyncPath.node.body;
+        // 获取父节点的函数体body
+        let info = asyncPath.node.body;
 
-         // 将函数体放到try语句的body中
-         tryNode.block.body.push(...info.body);
+        // 将函数体放到try语句的body中
+        tryNode.block.body.push(...info.body);
 
-         // 将父节点的body替换成新创建的try语句
-         info.body = [tryNode];
-       }
-     }
-   }
- }
+        // 将父节点的body替换成新创建的try语句
+        info.body = [tryNode];
+      }
+    }
+  };
+};
 ```
 
 到这里，插件的基本结构已经成型，但还有点问题，如果函数已存在 try/catch，该怎么处理判断呢？
 
 ### 若函数已存在 try/catch，则不处理
 
-```
+```js
 // 示例代码，不再添加try/catch
 async function fn() {
-    try {
-        await f()
-    } catch (e) {
-        console.log(e)
-    }
+  try {
+    await f();
+  } catch (e) {
+    console.log(e);
+  }
 }
 ```
 
 通过`isTryStatement`判断是否已存在 try 语句
 
-```
+```js
 module.exports = function (babel) {
-   let t = babel.type
-   return {
-     visitor: {
-       AwaitExpression(path) {
-
+  let t = babel.type;
+  return {
+    visitor: {
+      AwaitExpression(path) {
         // 判断父路径中是否已存在try语句，若存在直接返回
         if (path.findParent((p) => p.isTryStatement())) {
           return false;
         }
 
-         let node = path.node;
-         const asyncPath = path.findParent((p) => p.node.async && (p.isFunctionDeclaration() || p.isArrowFunctionExpression() || p.isFunctionExpression() || p.isObjectMethod()));
-         let tryNode = temp(tempArgumentObj);
-         let info = asyncPath.node.body;
-         tryNode.block.body.push(...info.body);
-         info.body = [tryNode];
-       }
-     }
-   }
- }
+        let node = path.node;
+        const asyncPath = path.findParent(
+          (p) =>
+            p.node.async &&
+            (p.isFunctionDeclaration() ||
+              p.isArrowFunctionExpression() ||
+              p.isFunctionExpression() ||
+              p.isObjectMethod())
+        );
+        let tryNode = temp(tempArgumentObj);
+        let info = asyncPath.node.body;
+        tryNode.block.body.push(...info.body);
+        info.body = [tryNode];
+      }
+    }
+  };
+};
 ```
 
 ### 添加报错信息
@@ -419,14 +439,14 @@ module.exports = function (babel) {
 
 **获取文件路径**
 
-```
+```js
 // 获取编译目标文件的路径，如：E:\myapp\src\App.vue
 const filePath = this.filename || this.file.opts.filename || 'unknown';
 ```
 
 **获取报错的方法名称**
 
-```
+```js
 // 定义方法名
 let asyncName = '';
 
@@ -434,26 +454,26 @@ let asyncName = '';
 let type = asyncPath.node.type;
 
 switch (type) {
-// 1️⃣函数表达式
-// 情况1：普通函数，如const func = async function () {}
-// 情况2：箭头函数，如const func = async () => {}
-case 'FunctionExpression':
-case 'ArrowFunctionExpression':
-  // 使用path.getSibling(index)来获得同级的id路径
-  let identifier = asyncPath.getSibling('id');
-  // 获取func方法名
-  asyncName = identifier && identifier.node ? identifier.node.name : '';
-  break;
+  // 1️⃣函数表达式
+  // 情况1：普通函数，如const func = async function () {}
+  // 情况2：箭头函数，如const func = async () => {}
+  case 'FunctionExpression':
+  case 'ArrowFunctionExpression':
+    // 使用path.getSibling(index)来获得同级的id路径
+    let identifier = asyncPath.getSibling('id');
+    // 获取func方法名
+    asyncName = identifier && identifier.node ? identifier.node.name : '';
+    break;
 
-// 2️⃣函数声明，如async function fn2() {}
-case 'FunctionDeclaration':
-  asyncName = (asyncPath.node.id && asyncPath.node.id.name) || '';
-  break;
+  // 2️⃣函数声明，如async function fn2() {}
+  case 'FunctionDeclaration':
+    asyncName = (asyncPath.node.id && asyncPath.node.id.name) || '';
+    break;
 
-// 3️⃣async函数作为对象的方法，如vue项目中，在methods中定义的方法: methods: { async func() {} }
-case 'ObjectMethod':
-  asyncName = asyncPath.node.key.name || '';
-  break;
+  // 3️⃣async函数作为对象的方法，如vue项目中，在methods中定义的方法: methods: { async func() {} }
+  case 'ObjectMethod':
+    asyncName = asyncPath.node.key.name || '';
+    break;
 }
 
 // 若asyncName不存在，通过argument.callee获取当前执行函数的name
@@ -474,7 +494,7 @@ let funcName = asyncName || (node.argument.callee && node.argument.callee.name) 
 
 **入口文件 index.js**
 
-```
+```js
 // babel-template 用于将字符串形式的代码来构建AST树节点
 const template = require('babel-template');
 
@@ -518,7 +538,14 @@ module.exports = function (babel) {
 
       // 在父路径节点中查找声明 async 函数的节点
       // async 函数分为4种情况：函数声明 || 箭头函数 || 函数表达式 || 对象的方法
-      const asyncPath = path.findParent((p) => p.node.async && (p.isFunctionDeclaration() || p.isArrowFunctionExpression() || p.isFunctionExpression() || p.isObjectMethod()));
+      const asyncPath = path.findParent(
+        (p) =>
+          p.node.async &&
+          (p.isFunctionDeclaration() ||
+            p.isArrowFunctionExpression() ||
+            p.isFunctionExpression() ||
+            p.isObjectMethod())
+      );
 
       // 获取async的方法名
       let asyncName = '';
@@ -577,12 +604,11 @@ module.exports = function (babel) {
     visitor
   };
 };
-
 ```
 
 **util.js**
 
-```
+```js
 const merge = require('deepmerge');
 
 // 定义try语句模板
@@ -636,7 +662,6 @@ module.exports = {
   matchesFile,
   toArray
 };
-
 ```
 
 [github 仓库](https://github.com/xy-sea/babel-plugin-await-add-trycatch)
@@ -659,8 +684,8 @@ npm 网站搜索`babel-plugin-await-add-trycatch`
 
 <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/dd0e972f1d4a4f819156e607255451e7~tplv-k3u1fbpfcp-watermark.image?" alt="nice.gif" width="30%" />
 
-**参考资料**  
-[Babel 插件手册](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/zh-Hans/plugin-handbook.md)  
+**参考资料**
+[Babel 插件手册](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/zh-Hans/plugin-handbook.md)
 [嘿，不要给 async 函数写那么多 try/catch 了](https://juejin.cn/post/6844903886898069511)
 
 ## 10w 字笔记推荐

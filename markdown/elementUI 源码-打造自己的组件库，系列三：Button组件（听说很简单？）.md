@@ -9,7 +9,7 @@ Button 按钮组件的源码虽确实不多，但仔细阅读，里边知识点�
 
 打开**packages/button/src/button.vue**
 
-```
+```js
 <template>
   <!--封装原生的button-->
   <button
@@ -94,7 +94,7 @@ Button 按钮组件的源码虽确实不多，但仔细阅读，里边知识点�
 
 按钮组的代码很简洁，我就不废话了
 
-```
+```js
 <template>
   <div class="el-button-group">
     <slot></slot>
@@ -113,7 +113,7 @@ Button 按钮组件的源码虽确实不多，但仔细阅读，里边知识点�
 重点来了，**button 的样式确实惊艳到我了（BEM 诚不欺我）**，特别是我这种第一次学习 BEM 思想的小菜狗  
 注：该文件定义了按钮和按钮组的样式。因 button.scss 代码较多，删减了一些，只罗列了关键代码
 
-```
+```js
 @charset "UTF-8";
 @import "common/var"; // 引入定义的样式与色板
 // 引入_button.scss,但这里写的是mixins/button（button前面没有_）。官方解释：使用SASS部分文件, sass局部文件的文件名以下划线开头。这样，sass就不会在编译时单独编译这个文件输出css，而只把这个文件用作导入。当你@import一个局部文件时，还可以不写文件的全名，即省略文件名开头的下划线
@@ -272,7 +272,7 @@ Button 按钮组件的源码虽确实不多，但仔细阅读，里边知识点�
 这里重点说明下`@mixin button-variant`  
 该代码快很好的利用`mix()函数`：`定义一套颜色规则，生成所有主题色对应状态的颜色`。
 
-```
+```js
 // 定义一套公共的样式规则，根据传入不同的主题色显示各状态的颜色（这一波操作666）
 @mixin button-variant($color, $background-color, $border-color) {
   color: $color;
@@ -321,7 +321,7 @@ Button 按钮组件的源码虽确实不多，但仔细阅读，里边知识点�
 补充介绍下 theme-chalk 目录内容，方法理解 elementUI 的 css 编码规则  
 `theme-chalk/src 目录`
 
-```
+```js
 |-- common  // 公共样式
     |-- popup.scss   // 定义弹出组件的样式
     |-- transition.scss  // 定义Element css动画样式
