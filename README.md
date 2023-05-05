@@ -40,6 +40,11 @@
 
 [20 个常见的前端算法题，你全都会吗？](https://github.com/xy-sea/blog/blob/main/markdown/20%E4%B8%AA%E5%B8%B8%E8%A7%81%E7%9A%84%E5%89%8D%E7%AB%AF%E7%AE%97%E6%B3%95%E9%A2%98%EF%BC%8C%E4%BD%A0%E5%85%A8%E9%83%BD%E4%BC%9A%E5%90%97%EF%BC%9F.md)
 
+### 手写面试题
+
+[js 手写题](https://github.com/xy-sea/blog/blob/main/%E6%9C%80%E5%85%A8js%E6%89%8B%E5%86%99%E9%A2%98/js%E6%89%8B%E5%86%99%E9%A2%98.md)  
+[手写设计模式](https://github.com/xy-sea/blog/blob/main/%E6%9C%80%E5%85%A8js%E6%89%8B%E5%86%99%E9%A2%98/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%AE%9E%E7%8E%B0.md)
+
 ### elementUI 组件库
 
 [elementUI 源码-打造自己的组件库，系列一：经典永不过时](https://github.com/xy-sea/blog/blob/main/markdown/elementUI%20%E6%BA%90%E7%A0%81-%E6%89%93%E9%80%A0%E8%87%AA%E5%B7%B1%E7%9A%84%E7%BB%84%E4%BB%B6%E5%BA%93%EF%BC%8C%E7%B3%BB%E5%88%97%E4%B8%80%EF%BC%9A%E7%BB%8F%E5%85%B8%E6%B0%B8%E4%B8%8D%E8%BF%87%E6%97%B6.md)  
