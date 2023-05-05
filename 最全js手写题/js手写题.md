@@ -620,26 +620,34 @@ mySetTimeout(() => {
 // 如果没有提供initialValue，找到数组中的第一个存在的值作为pre，下一个元素的下标作为index
 
 Array.prototype.myReduce = function (fn, initialValue) {
-  let pre, index;
+  // 处理数组类型异常
+  if (this === null || this === undefined) {
+    throw new TypeError("Cannot read property 'reduce' of null or undefined");
+  }
+  // 处理回调类型异常
+  if (Object.prototype.toString.call(fn) != '[object Function]') {
+    throw new TypeError(fn + ' is not a function');
+  }
+  let pre = initialValue,
+    index = 0;
   let arr = this.slice();
   if (initialValue === undefined) {
     // 没有设置初始值
     for (let i = 0; i < arr.length; i++) {
-      // 找到数组中第一个存在的元素，跳过稀疏数组中的空值
-      if (!arr.hasOwnProperty(i)) continue;
-      pre = arr[i]; // pre 为数组中第一个存在的元素
-      index = i + 1; // index 下一个元素
-      break; // 易错点：找到后跳出循环
+      // 查找原型链，找到数组中第一个存在的元素，跳过稀疏数组中的空值
+      if (i in arr) {
+        pre = arr[i]; // pre 为数组中第一个存在的元素
+        index = i + 1; // index 下一个元素
+        break; // 易错点：找到后跳出循环
+      }
     }
-  } else {
-    index = 0;
-    pre = initialValue;
   }
   for (let i = index; i < arr.length; i++) {
     // 跳过稀疏数组中的空值
-    if (!arr.hasOwnProperty(i)) continue;
-    // 注意：fn函数接收四个参数，pre之前累计值、cur 当前值、 当前下标、 arr 原数组
-    pre = fn.call(null, pre, arr[i], i, this);
+    if (i in arr) {
+      // 注意：fn函数接收四个参数，pre之前累计值、cur 当前值、 当前下标、 arr 原数组
+      pre = fn.call(undefined, pre, arr[i], i, arr);
+    }
   }
   return pre;
 };
