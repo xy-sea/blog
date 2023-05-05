@@ -2,12 +2,12 @@
 
 **借助闭包和函数作用域来实现块级作用域的效果**
 
-```
+```js
 // 用var实现案例2的效果
 var a = [];
 
 var _loop = function _loop(i) {
-  a[i] = function() {
+  a[i] = function () {
     console.log(i);
   };
 };
@@ -20,9 +20,9 @@ a[0](); // 0
 
 #### 手写 call apply bind
 
-```
+```js
 // 手写call
-Function.prototype.Call = function(context, ...args) {
+Function.prototype.Call = function (context, ...args) {
   // context为undefined或null时，则this默认指向全局window
   if (!context || context === null) {
     context = window;
@@ -39,7 +39,7 @@ Function.prototype.Call = function(context, ...args) {
 };
 
 // apply与call相似，只有第二个参数是一个数组，
-Function.prototype.Apply = function(context, args) {
+Function.prototype.Apply = function (context, args) {
   if (!context || context === null) {
     context = window;
   }
@@ -51,13 +51,13 @@ Function.prototype.Apply = function(context, args) {
 };
 
 // bind要考虑返回的函数，作为构造函数被调用的情况
-Function.prototype.Bind = function(context, ...args) {
+Function.prototype.Bind = function (context, ...args) {
   if (!context || context === null) {
     context = window;
   }
   let fn = this;
   let f = Symbol();
-  const result = function(...args1) {
+  const result = function (...args1) {
     if (this instanceof fn) {
       // result如果作为构造函数被调用，this指向的是new出来的对象
       // this instanceof fn，判断new出来的对象是否为fn的实例
@@ -80,10 +80,10 @@ Function.prototype.Bind = function(context, ...args) {
 
 **闭包的示例**
 
-```
+```js
 // 原始题目
 for (var i = 0; i < 5; i++) {
-  setTimeout(function() {
+  setTimeout(function () {
     console.log(i); // 1s后打印出5个5
   }, 1000);
 }
@@ -92,7 +92,7 @@ for (var i = 0; i < 5; i++) {
 
 // 方法一：
 for (var i = 0; i < 5; i++) {
-  (function(j) {
+  (function (j) {
     setTimeout(function timer() {
       console.log(j);
     }, 1000);
@@ -102,22 +102,30 @@ for (var i = 0; i < 5; i++) {
 // 方法二：
 // 利用setTimeout的第三个参数，第三个参数将作为setTimeout第一个参数的参数
 for (var i = 0; i < 5; i++) {
-  setTimeout(function fn(i) {
-    console.log(i);
-  }, 1000, i); // 第三个参数i,将作为fn的参数
+  setTimeout(
+    function fn(i) {
+      console.log(i);
+    },
+    1000,
+    i
+  ); // 第三个参数i,将作为fn的参数
 }
 
 // ⬅️将上述题目改成每间隔1s后，依次打印0,1,2,3,4
 for (var i = 0; i < 5; i++) {
-  setTimeout(function fn(i) {
-    console.log(i);
-  }, 1000 * i, i);
+  setTimeout(
+    function fn(i) {
+      console.log(i);
+    },
+    1000 * i,
+    i
+  );
 }
 ```
 
 **手写 instanceof 方法**
 
-```
+```js
 function instanceOf(obj, fn) {
   let proto = obj.__proto__;
   if (proto) {
@@ -139,20 +147,20 @@ console.log(instanceOf(dog, Dog), instanceOf(dog, Object)); // true true
 
 **手写 new**
 
-```
+```js
 function selfNew(fn, ...args) {
   // 创建一个instance对象，该对象的原型是fn.prototype
   let instance = Object.create(fn.prototype);
   // 调用构造函数，使用apply，将this指向新生成的对象
   let res = fn.apply(instance, args);
   // 如果fn函数有返回值，并且返回值是一个对象或方法，则返回该对象，否则返回新生成的instance对象
-  return typeof res === "object" || typeof res === "function" ? res : instance;
+  return typeof res === 'object' || typeof res === 'function' ? res : instance;
 }
 ```
 
 **手写寄生组合式继承**
 
-```
+```js
 // 精简版
 class Child {
   constructor() {
@@ -169,7 +177,7 @@ class Child {
 function Parent(name) {
   this.name = name;
 }
-Parent.prototype.getName = function() {
+Parent.prototype.getName = function () {
   console.log(this.name);
 };
 function Child(name, age) {
@@ -189,7 +197,7 @@ function createObj(o) {
 Child.prototype = createObj(Parent.prototype);
 Child.prototype.constructor = Child;
 
-let child = new Child("tom", 12);
+let child = new Child('tom', 12);
 child.getName(); // tom
 ```
 
@@ -198,7 +206,7 @@ child.getName(); // tom
 ES6 的 Class 内部是基于寄生组合式继承，它是目前最理想的继承方式  
 ES6 的 Class 允许子类继承父类的静态方法和静态属性
 
-```
+```js
 // Child 为子类的构造函数， Parent为父类的构造函数
 function selfClass(Child, Parent) {
   // Object.create 第二个参数，给生成的对象定义属性和属性描述符/访问器描述符
@@ -221,10 +229,10 @@ function Child() {
 }
 function Parent() {}
 // 设置父类的静态方法getInfo
-Parent.getInfo = function() {
-  console.log("info");
+Parent.getInfo = function () {
+  console.log('info');
 };
-Parent.prototype.getName = function() {
+Parent.prototype.getName = function () {
   console.log(this.name);
 };
 selfClass(Child, Parent);
@@ -235,7 +243,7 @@ tom.getName(); // 123
 
 #### 手写 promise
 
-```
+```js
 class Promise {
   constructor(fn) {
     // resolve时的回调函数列表
@@ -243,24 +251,24 @@ class Promise {
     // reject时的回调函数列表
     this.rejectTask = [];
     // state记录当前状态,共有pending、fulfilled、rejected 3种状态
-    this.state = "pending";
-    let resolve = value => {
+    this.state = 'pending';
+    let resolve = (value) => {
       // state状态只能改变一次，resolve和reject只会触发一种
-      if (this.state !== "pending") return;
-      this.state = "fulfilled";
+      if (this.state !== 'pending') return;
+      this.state = 'fulfilled';
       this.data = value;
       // 模拟异步，保证resolveTask事件先注册成功，要考虑在Promise里面写同步代码的情况
       setTimeout(() => {
-        this.resolveTask.forEach(cb => cb(value));
+        this.resolveTask.forEach((cb) => cb(value));
       });
     };
-    let reject = err => {
-      if (this.state !== "pending") return;
-      this.state = "rejected";
+    let reject = (err) => {
+      if (this.state !== 'pending') return;
+      this.state = 'rejected';
       this.error = err;
       // 保证rejectTask事件注册成功
       setTimeout(() => {
-        this.rejectTask.forEach(cb => cb(err));
+        this.rejectTask.forEach((cb) => cb(err));
       });
     };
 
@@ -308,18 +316,18 @@ new Promise((resolve, reject) => {
   setTimeout(() => {
     resolve(1);
   }, 500);
-}).then(
-    res => {
-      console.log(res);
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(2);
-        }, 1000);
-      });
-    }
-  ).then(data => {
-      console.log(data);
+})
+  .then((res) => {
+    console.log(res);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(2);
+      }, 1000);
     });
+  })
+  .then((data) => {
+    console.log(data);
+  });
 ```
 
 #### 手写 race、all
@@ -327,7 +335,7 @@ new Promise((resolve, reject) => {
 `race`：返回 promises 列表中第一个执行完的结果  
 `all`：返回 promises 列表中全部执行完的结果
 
-```
+```js
 class Promise {
   // race静态方法，返回promises列表中第一个执行完的结果
   static race(promises) {
@@ -335,10 +343,10 @@ class Promise {
       for (let i = 0; i < promises.length; i++) {
         // Promise.resolve包一下，防止promises[i]不是Promise类型
         Promise.resolve(promises[i])
-          .then(res => {
+          .then((res) => {
             resolve(res);
           })
-          .catch(err => {
+          .catch((err) => {
             reject(err);
           });
       }
@@ -352,7 +360,7 @@ class Promise {
     return new Promise((resolve, reject) => {
       for (let i = 0; i < promises.length; i++) {
         Promise.resolve(promises[i])
-          .then(res => {
+          .then((res) => {
             // 输出结果的顺序和promises的顺序一致
             result[i] = res;
             index++;
@@ -360,7 +368,7 @@ class Promise {
               resolve(result);
             }
           })
-          .catch(err => {
+          .catch((err) => {
             reject(err);
           });
       }
@@ -373,19 +381,20 @@ class Promise {
 
 `retry`的作用，当接口请求失败后，每间隔几秒，再重发几次
 
-```
+```js
 /*
-* @param {function} fn - 方法名
-* @param {number} delay - 延迟的时间
-* @param {number} times - 重发的次数
-*/
+ * @param {function} fn - 方法名
+ * @param {number} delay - 延迟的时间
+ * @param {number} times - 重发的次数
+ */
 function retry(fn, delay, times) {
   return new Promise((resolve, reject) => {
     function func() {
-      Promise.resolve(fn()).then(res => {
+      Promise.resolve(fn())
+        .then((res) => {
           resolve(res);
         })
-        .catch(err => {
+        .catch((err) => {
           // 接口失败后，判断剩余次数不为0时，继续重发
           if (times !== 0) {
             setTimeout(func, delay);
@@ -402,10 +411,10 @@ function retry(fn, delay, times) {
 
 #### 手写 async、await
 
-```
+```js
 function generatorToAsync(generatorFn) {
   // 返回的是一个新的函数
-  return function() {
+  return function () {
     // 先调用generator函数 生成迭代器
     // 对应 var gen = testG()
     const gen = generatorFn.apply(this, arguments);
@@ -435,13 +444,13 @@ function generatorToAsync(generatorFn) {
           // value有可能是：常量\Promise；
           // Promise有可能是成功或者失败
           return Promise.resolve(value).then(
-            val => step("next", val),
-            err => step("throw", err)
+            (val) => step('next', val),
+            (err) => step('throw', err)
           );
         }
       }
 
-      step("next"); // 第一次执行
+      step('next'); // 第一次执行
     });
   };
 }
@@ -449,23 +458,22 @@ function generatorToAsync(generatorFn) {
 // 测试generatorToAsync
 
 // 1秒后打印data1 再过一秒打印data2 最后打印success
-const getData = () =>
-  new Promise(resolve => setTimeout(() => resolve("data"), 1000));
+const getData = () => new Promise((resolve) => setTimeout(() => resolve('data'), 1000));
 var test = generatorToAsync(function* testG() {
   // await被编译成了yield
   const data = yield getData();
-  console.log("data1: ", data);
+  console.log('data1: ', data);
   const data2 = yield getData();
-  console.log("data2: ", data2);
-  return "success";
+  console.log('data2: ', data2);
+  return 'success';
 });
 
-test().then(res => console.log(res));
+test().then((res) => console.log(res));
 ```
 
 **手写深拷贝代码**
 
-```
+```js
 // 使用hash 存储已拷贝过的对象，避免循环拷贝和重复拷贝
 function deepClone(target, hash = new WeakMap()) {
   if (!isObject(target)) return target;
@@ -486,7 +494,7 @@ function deepClone(target, hash = new WeakMap()) {
   return newObj;
 }
 function isObject(target) {
-  return typeof target === "object" && target !== null;
+  return typeof target === 'object' && target !== null;
 }
 
 // 示例
@@ -505,33 +513,33 @@ console.log(val);
 
 **Event Loop 经典题目**
 
-```
+```js
 Promise.resolve()
-  .then(function() {
-    console.log("promise0");
+  .then(function () {
+    console.log('promise0');
   })
-  .then(function() {
-    console.log("promise5");
+  .then(function () {
+    console.log('promise5');
   });
 setTimeout(() => {
-  console.log("timer1");
-  Promise.resolve().then(function() {
-    console.log("promise2");
+  console.log('timer1');
+  Promise.resolve().then(function () {
+    console.log('promise2');
   });
-  Promise.resolve().then(function() {
-    console.log("promise4");
+  Promise.resolve().then(function () {
+    console.log('promise4');
   });
 }, 0);
 setTimeout(() => {
-  console.log("timer2");
-  Promise.resolve().then(function() {
-    console.log("promise3");
+  console.log('timer2');
+  Promise.resolve().then(function () {
+    console.log('promise3');
   });
 }, 0);
-Promise.resolve().then(function() {
-  console.log("promise1");
+Promise.resolve().then(function () {
+  console.log('promise1');
 });
-console.log("start");
+console.log('start');
 
 // 打印结果： start promise0 promise1 promise5 timer1 promise2 promise4 timer2 promise3
 ```
@@ -541,37 +549,37 @@ console.log("start");
 async 隐式返回 Promise，会产生一个微任务  
 await 后面的代码是在微任务时执行
 
-```
-console.log("script start");
+```js
+console.log('script start');
 async function async1() {
   await async2(); // await 隐式返回promise
-  console.log("async1 end"); // 这里的执行时机：在执行微任务时执行
+  console.log('async1 end'); // 这里的执行时机：在执行微任务时执行
 }
 async function async2() {
-  console.log("async2 end"); // 这里是同步代码
+  console.log('async2 end'); // 这里是同步代码
 }
 async1();
-setTimeout(function() {
-  console.log("setTimeout");
+setTimeout(function () {
+  console.log('setTimeout');
 }, 0);
-new Promise(resolve => {
-  console.log("Promise"); // 这里是同步代码
+new Promise((resolve) => {
+  console.log('Promise'); // 这里是同步代码
   resolve();
 })
-  .then(function() {
-    console.log("promise1");
+  .then(function () {
+    console.log('promise1');
   })
-  .then(function() {
-    console.log("promise2");
+  .then(function () {
+    console.log('promise2');
   });
-console.log("script end");
+console.log('script end');
 
 // 打印结果:  script start => async2 end => Promise => script end => async1 end => promise1 => promise2 => setTimeout
 ```
 
 #### setTimeout 模拟实现 setInterval
 
-```
+```js
 // 使用闭包实现
 function mySetInterval(fn, t) {
   let timer = null;
@@ -591,7 +599,7 @@ function mySetInterval(fn, t) {
 
 #### setInterval 模拟实现 setTimeout
 
-```
+```js
 function mySetTimeout(fn, time) {
   let timer = setInterval(() => {
     clearInterval(timer);
@@ -607,11 +615,11 @@ mySetTimeout(() => {
 
 **手写 reduce 函数**
 
-```
+```js
 // 如果提供了initialValue时，则作为pre的初始值，index从0开始；
 // 如果没有提供initialValue，找到数组中的第一个存在的值作为pre，下一个元素的下标作为index
 
-Array.prototype.myReduce = function(fn, initialValue) {
+Array.prototype.myReduce = function (fn, initialValue) {
   let pre, index;
   let arr = this.slice();
   if (initialValue === undefined) {
@@ -640,16 +648,16 @@ console.log([, , , 1, 2, 3, 4].myReduce((pre, cur) => pre + cur)); // 10
 
 **手写 compose 函数**
 
-```
+```js
 function compose(list) {
   // 取出第一个函数，当做reduce函数的初始值
   const init = list.shift();
-  return function(...arg) {
+  return function (...arg) {
     // 执行compose函数，返回一个函数
     return list.reduce(
       (pre, cur) => {
         // 返回list.reduce的结果，为一个promise实例，外部就可以通过then获取
-        return pre.then(result => {
+        return pre.then((result) => {
           // pre始终为一个promise实例，result为结果的累加值
           // 在前一个函数的then中，执行当前的函数，并返回一个promise实例，实现累加传递的效果
           return cur.call(null, result);
@@ -662,62 +670,61 @@ function compose(list) {
 }
 
 // 同步方法案例
-let sync1 = data => {
-  console.log("sync1");
+let sync1 = (data) => {
+  console.log('sync1');
   return data;
 };
-let sync2 = data => {
-  console.log("sync2");
+let sync2 = (data) => {
+  console.log('sync2');
   return data + 1;
 };
-let sync3 = data => {
-  console.log("sync3");
+let sync3 = (data) => {
+  console.log('sync3');
   return data + 2;
 };
 let syncFn = compose([sync1, sync2, sync3]);
-syncFn(0).then(res => {
+syncFn(0).then((res) => {
   console.log(res);
 });
 // 依次打印 sync1 → sync2 → sync3 → 3
 
 // 异步方法案例
-let async1 = data => {
-  return new Promise(resolve => {
+let async1 = (data) => {
+  return new Promise((resolve) => {
     setTimeout(() => {
-      console.log("async1");
+      console.log('async1');
       resolve(data);
     }, 1000);
   });
 };
-let async2 = data => {
-  return new Promise(resolve => {
+let async2 = (data) => {
+  return new Promise((resolve) => {
     setTimeout(() => {
-      console.log("async2");
+      console.log('async2');
       resolve(data + 1);
     }, 1000);
   });
 };
-let async3 = data => {
-  return new Promise(resolve => {
+let async3 = (data) => {
+  return new Promise((resolve) => {
     setTimeout(() => {
-      console.log("async3");
+      console.log('async3');
       resolve(data + 2);
     }, 1000);
   });
 };
 let composeFn = compose([async1, async2, async3]);
-composeFn(0).then(res => {
+composeFn(0).then((res) => {
   console.log(res);
 });
 // 依次打印 async1 → async1 → async1 → 3
-
 ```
 
 **手写数组扁平化**
 
-```
+```js
 // deep初始值为1
-Array.prototype.myFlat = function(deep = 1) {
+Array.prototype.myFlat = function (deep = 1) {
   let arr = this;
   // deep为0则返回，递归结束
   if (deep == 0) return arr;
@@ -732,13 +739,12 @@ Array.prototype.myFlat = function(deep = 1) {
   }, []);
 };
 console.log([1, 2, 3, [4, [5, [6]]]].myFlat(2)); // [1, 2, 3, 4, 5, [6]]
-
 ```
 
 **手写 map 函数**
 
-```
-Array.prototype.selfMap = function(fn, content) {
+```js
+Array.prototype.selfMap = function (fn, content) {
   // map中的第二个参数作为fn函数的this
   // Array.prototype.slice.call将类数组转化为数组，同Array.from, this为调用的数组（arr）
   let arr = Array.prototype.slice.call(this);
@@ -752,13 +758,13 @@ Array.prototype.selfMap = function(fn, content) {
   return mappedArr;
 };
 let arr = [1, 2, 3];
-console.log(arr.selfMap(item => item * 2)); // [2, 4, 6]
+console.log(arr.selfMap((item) => item * 2)); // [2, 4, 6]
 ```
 
 **手写 some 函数**
 
-```
-Array.prototype.mySome = function(fn) {
+```js
+Array.prototype.mySome = function (fn) {
   let result = false;
   for (let i = 0; i < this.length; i++) {
     // 判断条件是否满足，满足跳出循环
@@ -769,8 +775,7 @@ Array.prototype.mySome = function(fn) {
   }
   return result;
 };
-console.log([1, 2, 3, 4].mySome(item => item > 6)); // false
-
+console.log([1, 2, 3, 4].mySome((item) => item > 6)); // false
 ```
 
 #### 判断所有数据类型的方法
@@ -779,7 +784,7 @@ console.log([1, 2, 3, 4].mySome(item => item > 6)); // false
 
 **示例**
 
-```
+```js
 function getDataType(target) {
   return Object.prototype.toString.call(target).slice(8, -1).toLowerCase();
 }
@@ -789,7 +794,6 @@ console.log(getDataType(undefined)); // undefined
 console.log(getDataType(Symbol())); // symbol
 console.log(getDataType(new Date())); // date
 console.log(getDataType(new Set())); // set
-
 ```
 
 #### 实现 es6 模板字符串
@@ -798,12 +802,12 @@ console.log(getDataType(new Set())); // set
 
 **示例**
 
-```
-let name = "小明";
+```js
+let name = '小明';
 let age = 20;
-let str1 = "我叫${name},我的年龄 ${ age}";
+let str1 = '我叫${name},我的年龄 ${ age}';
 function tempalteStr(str) {
-  return str.replace(/\$\{(.*?)\}/g, function(str, k) {
+  return str.replace(/\$\{(.*?)\}/g, function (str, k) {
     // eval(name) 替换成 小明
     // // eval(age) 替换成 20
     return eval(k);
@@ -820,7 +824,7 @@ console.log(tempalteStr(str1)); // 我叫小明,我的年龄20
 
 **示例**
 
-```
+```js
 function mycurry(fn) {
   // fn.length 表示函数中参数的长度
   // 函数的length属性，表示形参的个数，不包含剩余参数，仅包括第一个有默认值之前的参数个数（不包含有默认值的参数）
@@ -844,7 +848,6 @@ function fn(a, b, c, d) {
 }
 let fn1 = mycurry(fn);
 console.log(fn1(1)(2)(3)(4)); // 10
-
 ```
 
 #### 函数防抖
@@ -855,7 +858,7 @@ console.log(fn1(1)(2)(3)(4)); // 10
 
 **示例**
 
-```
+```js
 /*
  * @param {function} fn - 需要防抖的函数
  * @param {number} time - 多长时间执行一次
@@ -863,7 +866,7 @@ console.log(fn1(1)(2)(3)(4)); // 10
  */
 function debounce(fn, time, flag) {
   let timer;
-  return function(...args) {
+  return function (...args) {
     // 在time时间段内重复执行，会清空之前的定时器，然后重新计时
     timer && clearTimeout(timer);
     if (flag && !timer) {
@@ -877,7 +880,7 @@ function debounce(fn, time, flag) {
 }
 
 function fn(a) {
-  console.log("执行:", a);
+  console.log('执行:', a);
 }
 let debounceFn = debounce(fn, 3000, true);
 debounceFn(1);
@@ -896,7 +899,7 @@ debounceFn(3);
 
 **示例**
 
-```
+```js
 /*
  * @param {function} fn - 需要防抖的函数
  * @param {number} time - 多长时间执行一次
@@ -904,7 +907,7 @@ debounceFn(3);
  */
 function throttle(fn, time, flag) {
   let timer;
-  return function(...args) {
+  return function (...args) {
     // flag控制第一次是否立即执行
     if (flag) {
       fn.apply(this, args);
@@ -923,7 +926,7 @@ function throttle(fn, time, flag) {
 
 // 测试
 function fn() {
-  console.log("fn");
+  console.log('fn');
 }
 let throttleFn = throttle(fn, 3000, true);
 setInterval(throttleFn, 500);
@@ -937,10 +940,10 @@ setInterval(throttleFn, 500);
 
 **示例**
 
-```
+```js
 // 虚拟dom转化为真实dom
 function render(node) {
-  if (typeof node === "string") {
+  if (typeof node === 'string') {
     // 创建文本节点
     return document.createTextNode(node);
   }
@@ -948,13 +951,13 @@ function render(node) {
   let dom = document.createElement(node.tag);
   if (node.attrs) {
     // 设置dom属性
-    Object.keys(node.attrs).forEach(key => {
+    Object.keys(node.attrs).forEach((key) => {
       dom.setAttribute(key, node.attrs[key]);
     });
   }
   // 递归生成子节点
   if (node.children) {
-    node.children.forEach(item => {
+    node.children.forEach((item) => {
       dom.appendChild(render(item));
     });
   }
@@ -968,14 +971,14 @@ function render(node) {
 
 **示例**
 
-```
- // 将真实dom转化为虚拟dom
+```js
+// 将真实dom转化为虚拟dom
 function dom2Json(dom) {
   if (!dom.tagName) return;
   let obj = {};
   obj.tag = dom.tagName;
   obj.children = [];
-  dom.childNodes.forEach(item => {
+  dom.childNodes.forEach((item) => {
     // 去掉空的节点
     dom2Json(item) && obj.children.push(dom2Json(item));
   });
@@ -993,21 +996,21 @@ IntersectionObserver 替代监听 scroll 事件来判断元素是否在视口中
 
 **图片懒加载示例**
 
-```
+```js
 // html内容
 // <img src="./loading.jpg" data-src="https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg">
 // <img src="./loading.jpg" data-src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg">
 
 function observerImg() {
   // 获取所有的图片元素
-  let imgList = document.getElementsByTagName("img");
-  let observer = new IntersectionObserver(list => {
+  let imgList = document.getElementsByTagName('img');
+  let observer = new IntersectionObserver((list) => {
     // 回调的数据是一个数组
-    list.forEach(item => {
+    list.forEach((item) => {
       // 判断元素是否出现在视口
       if (item.intersectionRatio > 0) {
         // 设置img的src属性
-        item.target.src = item.target.getAttribute("data-src");
+        item.target.src = item.target.getAttribute('data-src');
         // 设置src属性后，停止监听
         observer.unobserve(item.target);
       }
@@ -1028,7 +1031,7 @@ function observerImg() {
 
 **示例**
 
-```
+```js
 /*
  * 控制并发数
  * @param {array} list - 请求列表
@@ -1051,7 +1054,6 @@ function control(list, num) {
   }
   fn();
 }
-
 ```
 
 #### LazyMan
@@ -1060,13 +1062,13 @@ function control(list, num) {
 
 **示例**
 
-```
+```js
 class LazyMan {
   constructor(name) {
     this.name = name;
     this.task = []; // 任务列表
     function fn() {
-      console.log("hi" + this.name);
+      console.log('hi' + this.name);
       this.next();
     }
     this.task.push(fn);
@@ -1082,7 +1084,7 @@ class LazyMan {
   }
   sleepFirst(time) {
     function fn() {
-      console.log("sleepFirst" + time);
+      console.log('sleepFirst' + time);
       setTimeout(() => {
         this.next();
       }, time);
@@ -1094,7 +1096,7 @@ class LazyMan {
   }
   sleep(time) {
     function fn() {
-      console.log("sleep" + time);
+      console.log('sleep' + time);
       setTimeout(() => {
         this.next();
       }, time);
@@ -1104,7 +1106,7 @@ class LazyMan {
   }
   eat(something) {
     function fn() {
-      console.log("eat" + something);
+      console.log('eat' + something);
       this.next();
     }
     this.task.push(fn);
@@ -1112,11 +1114,7 @@ class LazyMan {
   }
 }
 
-new LazyMan("王")
-  .sleepFirst(3000)
-  .eat("breakfast")
-  .sleep(3000)
-  .eat("dinner");
+new LazyMan('王').sleepFirst(3000).eat('breakfast').sleep(3000).eat('dinner');
 ```
 
 #### sleep 函数的多种实现
@@ -1127,7 +1125,7 @@ JS 没有语言内置的休眠（sleep or wait）函数，所谓的 sleep 只是
 
 **示例**
 
-```
+```js
 // 方法一：
 // 这种实现方式是利用一个伪死循环阻塞主线程。
 // 因为JS是单线程的，所以通过这种方式可以实现真正意义上的sleep
@@ -1146,7 +1144,7 @@ function sleep2(fn, time) {
 
 // 方式三： promise
 function sleep3(fn, time) {
-  new Promise(resolve => {
+  new Promise((resolve) => {
     setTimeout(resolve, time);
   }).then(() => {
     fn();
@@ -1155,16 +1153,17 @@ function sleep3(fn, time) {
 
 // 方式四： async await
 async function sleep4(fn, time) {
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     setTimeout(resolve, time);
   });
   fn();
 }
-function fn() { console.log("fn")}
+function fn() {
+  console.log('fn');
+}
 
 sleep1(fn, 2000);
 sleep2(fn, 2000);
 sleep3(fn, 2000);
 sleep4(fn, 2000);
-
 ```
