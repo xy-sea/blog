@@ -752,21 +752,60 @@ console.log([1, 2, 3, [4, [5, [6]]]].myFlat(2)); // [1, 2, 3, 4, 5, [6]]
 **手写 map 函数**
 
 ```js
+/**
+ * fn 接受3个参数，element 当前正在处理的元素、index 正在处理的元素在数组中的索引、array 调用了 map() 的数组本身
+ * content 为 执行 fn 时用作 this 的值
+ */
 Array.prototype.selfMap = function (fn, content) {
-  // map中的第二个参数作为fn函数的this
-  // Array.prototype.slice.call将类数组转化为数组，同Array.from, this为调用的数组（arr）
-  let arr = Array.prototype.slice.call(this);
-  let mappedArr = Array(); // 创建一个空数组
-  for (let i = 0; i < arr.length; i++) {
-    // 判断稀疏数组，跳过稀疏数组中的空值
-    // 稀疏数组：数组中元素的个数小于数组的长度，比如Array(2) 长度为2的稀疏数组
-    if (!arr.hasOwnProperty(i)) continue;
-    mappedArr[i] = fn.call(content, arr[i]);
+  if (this === null || this === undefined) {
+    throw new TypeError("Cannot read property 'map' of null or undefined");
   }
-  return mappedArr;
+  if (Object.prototype.toString.call(fn) != '[object Function]') {
+    throw new TypeError(`${fn} is not a function `);
+  }
+  let arr = this.slice();
+  let list = new Array(arr.length);
+  for (let i = 0; i < arr.length; i++) {
+    // in 表示在原型链查找
+    // 跳过稀疏数组
+    if (i in arr) {
+      // 依次传入this, 当前项，当前索引，整个数组
+      list[i] = fn.call(content, arr[i], i, arr);
+    }
+  }
+  return list;
 };
 let arr = [1, 2, 3];
 console.log(arr.selfMap((item) => item * 2)); // [2, 4, 6]
+```
+
+**手写 filter 函数**
+
+```js
+/**
+ * fn 接受3个参数，element 当前正在处理的元素、index 正在处理的元素在数组中的索引、array 调用了 map() 的数组本身
+ * content 为 执行 fn 时用作 this 的值
+ */
+
+Array.prototype.myFilter = function (fn, content) {
+  if (this === null || this === undefined) {
+    throw new TypeError("Cannot read property 'filter' of null or undefined");
+  }
+  // 处理回调类型异常
+  if (Object.prototype.toString.call(fn) != '[object Function]') {
+    throw new TypeError(`${fn} is not a function`);
+  }
+  let arr = this.slice();
+  let list = new Array();
+  for (let i = 0; i < arr.length; i++) {
+    if (i in arr) {
+      if (fn.call(content, arr[i], i, arr)) {
+        list.push(arr[i]);
+      }
+    }
+  }
+  return list;
+};
 ```
 
 **手写 some 函数**
