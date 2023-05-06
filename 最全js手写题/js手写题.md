@@ -22,9 +22,9 @@ a[0](); // 0
 
 ```js
 // 手写call
-Function.prototype.Call = function (context, ...args) {
+Function.prototype.call = function (context, ...args) {
   // context为undefined或null时，则this默认指向全局window
-  if (!context || context === null) {
+  if (context === undefined || context === null) {
     context = window;
   }
   // 利用Symbol创建一个唯一的key值，防止新增加的属性与obj中的属性名重复
@@ -39,8 +39,8 @@ Function.prototype.Call = function (context, ...args) {
 };
 
 // apply与call相似，只有第二个参数是一个数组，
-Function.prototype.Apply = function (context, args) {
-  if (!context || context === null) {
+Function.prototype.apply = function (context, args) {
+  if (context === undefined || context === null) {
     context = window;
   }
   let fn = Symbol();
@@ -52,7 +52,11 @@ Function.prototype.Apply = function (context, args) {
 
 // bind要考虑返回的函数，作为构造函数被调用的情况
 Function.prototype.Bind = function (context, ...args) {
-  if (!context || context === null) {
+  // 异常处理
+  if (typeof this !== 'function') {
+    throw new Error('Function.prototype.bind - what is trying to be bound is not callable');
+  }
+  if (context === undefined || context === null) {
     context = window;
   }
   let fn = this;
@@ -149,13 +153,30 @@ console.log(instanceOf(dog, Dog), instanceOf(dog, Object)); // true true
 
 ```js
 function selfNew(fn, ...args) {
-  // 创建一个instance对象，该对象的原型是fn.prototype
+  if (typeof fn !== 'function') {
+    throw new Error(`${fn} is not a function`);
+  }
+  // 创建一个instance对象，该对象的原型是 fn.prototype
   let instance = Object.create(fn.prototype);
   // 调用构造函数，使用apply，将this指向新生成的对象
   let res = fn.apply(instance, args);
   // 如果fn函数有返回值，并且返回值是一个对象或方法，则返回该对象，否则返回新生成的instance对象
-  return typeof res === 'object' || typeof res === 'function' ? res : instance;
+  return (typeof res === 'object' && res !== null) || typeof res === 'function' ? res : instance;
 }
+
+// 测试
+function Person(firtName, lastName) {
+  this.firtName = firtName;
+  this.lastName = lastName;
+}
+
+Person.prototype.getFullName = function () {
+  return `${this.firtName} ${this.lastName}`;
+};
+
+const tb = new Person('小', '李');
+const tb1 = selfNew(Person, '小', '李');
+console.log(tb, tb1);
 ```
 
 **手写寄生组合式继承**
