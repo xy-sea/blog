@@ -52,10 +52,6 @@ Function.prototype.apply = function (context, args) {
 
 // bind要考虑返回的函数，作为构造函数被调用的情况
 Function.prototype.Bind = function (context, ...args) {
-  // 异常处理
-  if (typeof this !== 'function') {
-    throw new Error('Function.prototype.bind - what is trying to be bound is not callable');
-  }
   if (context === undefined || context === null) {
     context = window;
   }
@@ -104,7 +100,7 @@ for (var i = 0; i < 5; i++) {
 }
 
 // 方法二：
-// 利用setTimeout的第三个参数，第三个参数将作为setTimeout第一个参数的参数
+// 利用setTimeout的第三个参数，第三个参数将作为setTimeout第一个函数的参数
 for (var i = 0; i < 5; i++) {
   setTimeout(
     function fn(i) {
