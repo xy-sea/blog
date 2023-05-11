@@ -1063,9 +1063,6 @@ function domToJson(node) {
   }
   return obj;
 }
-const div = document.getElementById('box');
-const json = domToJson(div);
-console.log('json', json);
 ```
 
 #### 图片懒加载
