@@ -372,9 +372,9 @@ class Promise {
 
   // all静态方法， 返回promises列表中全部执行完的结果
   static all(promises) {
-    let result = [];
-    let index = 0;
     return new Promise((resolve, reject) => {
+      let result = [];
+      let index = 0;
       for (let i = 0; i < promises.length; i++) {
         Promise.resolve(promises[i])
           .then((res) => {
@@ -780,10 +780,7 @@ Array.prototype.selfMap = function (fn, content) {
   if (Object.prototype.toString.call(fn) != '[object Function]') {
     throw new TypeError(`${fn} is not a function `);
   }
-  //  Array.prototype.map() 函数的第二个参数只有为 null 或 undefined 时，回调函数中的 this 值才会指向全局对象
-  if (content === null || content === undefined) {
-    content = window;
-  }
+
   let arr = this.slice();
   let list = new Array(arr.length);
   for (let i = 0; i < arr.length; i++) {
