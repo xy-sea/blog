@@ -1038,17 +1038,34 @@ function render(node) {
 
 ```js
 // 将真实dom转化为虚拟dom
-function dom2Json(dom) {
-  if (!dom.tagName) return;
+function domToJson(node) {
   let obj = {};
-  obj.tag = dom.tagName;
-  obj.children = [];
-  dom.childNodes.forEach((item) => {
-    // 去掉空的节点
-    dom2Json(item) && obj.children.push(dom2Json(item));
-  });
+  obj.nodeName = node.nodeName;
+  obj.nodeType = node.nodeType;
+  if (node.attributes && node.attributes.length) {
+    obj.attributes = {};
+    for (let i = 0; i < node.attributes.length; i++) {
+      let attr = node.attributes[i];
+      obj.attributes[attr.nodeName] = attr.nodeValue;
+    }
+  }
+  if (node.childNodes && node.childNodes.length) {
+    obj.childNodes = [];
+    for (let i = 0; i < node.childNodes.length; i++) {
+      let child = node.childNodes[i];
+      // nodeType： 1 元素节点、3 文本节点
+      if (child.nodeType == 1) {
+        obj.childNodes.push(domToJson(child));
+      } else if (child.nodeType == 3) {
+        obj.childNodes.push(child.nodeValue);
+      }
+    }
+  }
   return obj;
 }
+const div = document.getElementById('box');
+const json = domToJson(div);
+console.log('json', json);
 ```
 
 #### 图片懒加载
