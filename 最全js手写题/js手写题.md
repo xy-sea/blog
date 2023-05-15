@@ -1246,3 +1246,37 @@ sleep2(fn, 2000);
 sleep3(fn, 2000);
 sleep4(fn, 2000);
 ```
+
+```js
+// 手写发布订阅模式
+class EventBus {
+  constructor() {
+    this.task = {};
+  }
+  on(type, fn) {
+    if (!this.task[type]) {
+      this.task[type] = [];
+    }
+    this.task[type].push(fn);
+  }
+  emit(type, ...args) {
+    if (this.task[type]) {
+      this.task[type].forEach((fn) => {
+        fn.apply(undefined, args);
+      });
+    }
+  }
+  off(type, fn) {
+    if (this.task[type]) {
+      this.task[type] = this.task[type].filter((item) => item != fn);
+    }
+  }
+  once(type, fn) {
+    function f(...args) {
+      fn.apply(undefined, args);
+      this.off(type, fn);
+    }
+    this.emit(type, fn);
+  }
+}
+```
